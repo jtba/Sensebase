@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ContextPedia — Your Codebase, Understood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border: #2a2a3a;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+            --gradient-2: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .bg-glow-1 {
+            top: -200px;
+            right: -200px;
+            background: var(--accent);
+        }
+
+        .bg-glow-2 {
+            bottom: -200px;
+            left: -200px;
+            background: #8b5cf6;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Main content */
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 8rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .hero-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+        }
+
+        .hero h1 .gradient {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent);
+        }
+
+        /* Problem/Solution */
+        .problem-solution {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Section headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.375rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* How it works - Diagram */
+        .diagram-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 3rem;
+            margin: 3rem 0;
+            overflow-x: auto;
+        }
+
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            min-width: 800px;
+            padding: 1rem 0;
+        }
+
+        .diagram-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            min-width: 140px;
+            transition: all 0.3s;
+        }
+
+        .diagram-node:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .diagram-node.highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-color: var(--accent);
+        }
+
+        .diagram-node-icon {
+            font-size: 2rem;
+        }
+
+        .diagram-node-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .diagram-node-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .diagram-arrow {
+            display: flex;
+            align-items: center;
+            color: var(--accent);
+            font-size: 1.5rem;
+            animation: flow 1.5s infinite;
+        }
+
+        @keyframes flow {
+            0%, 100% { opacity: 0.5; transform: translateX(0); }
+            50% { opacity: 1; transform: translateX(4px); }
+        }
+
+        .diagram-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        /* Steps */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .step {
+            position: relative;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step h3 {
+            margin-top: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .step p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Features grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature {
+            padding: 1.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .feature:hover {
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Tech stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-card {
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .tech-card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .tech-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-card p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Benefits */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .benefit {
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .benefit-icon {
+            flex-shrink: 0;
+            width: 48px;
+            height: 48px;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .benefit h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .benefit p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Code example */
+        .code-block {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        .code-block .comment {
+            color: var(--text-muted);
+        }
+
+        .code-block .command {
+            color: var(--success);
+        }
+
+        .code-block .flag {
+            color: var(--accent-light);
+        }
+
+        /* CTA */
+        .cta {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.05) 100%);
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            margin-bottom: 1rem;
+        }
+
+        .cta p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section {
+                padding: 4rem 1.5rem;
+            }
+
+            .hero {
+                padding-top: 6rem;
+            }
+
+            .diagram-container {
+                padding: 1.5rem;
+            }
+
+            .diagram {
+                flex-direction: column;
+                min-width: auto;
+            }
+
+            .diagram-arrow {
+                transform: rotate(90deg);
+            }
+
+            .diagram-group {
+                flex-direction: row;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <nav>
+        <div class="logo">ContextPedia</div>
+        <ul class="nav-links">
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#benefits">Benefits</a></li>
+            <li><a href="#technology">Technology</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                AI-Powered Code Understanding
+            </div>
+            <h1>
+                Turn Your Codebase Into<br>
+                <span class="gradient">Searchable Knowledge</span>
+            </h1>
+            <p>
+                ContextPedia crawls your repositories and extracts business logic, 
+                data schemas, and system relationships — creating a single source of truth 
+                that AI agents and humans can actually understand.
+            </p>
+            <div class="hero-buttons">
+                <a href="#how-it-works" class="btn btn-primary">
+                    See How It Works →
+                </a>
+                <a href="#features" class="btn btn-secondary">
+                    Explore Features
+                </a>
+            </div>
+
+            <div class="problem-solution fade-in">
+                <div class="card">
+                    <div class="card-icon">😵</div>
+                    <h3>The Problem</h3>
+                    <p>Knowledge is scattered across 200+ repositories. New developers spend weeks understanding the system. AI tools lack context about your business logic.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">✨</div>
+                    <h3>The Solution</h3>
+                    <p>ContextPedia extracts and connects everything — schemas, APIs, services, dependencies — into a unified, searchable knowledge base.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works">
+            <div class="section-header fade-in">
+                <span class="section-tag">How It Works</span>
+                <h2>From Code to Knowledge in Minutes</h2>
+                <p>A simple pipeline that transforms scattered code into structured, queryable intelligence</p>
+            </div>
+
+            <div class="diagram-container fade-in">
+                <div class="diagram">
+                    <div class="diagram-node">
+                        <div class="diagram-node-icon">🗄️</div>
+                        <div class="diagram-node-label">GitLab</div>
+                        <div class="diagram-node-sub">Your Repositories</div>
+                    </div>
+                    
+                    <div class="diagram-arrow">→</div>
+                    
+                    <div class="diagram-node">
+                        <div class="diagram-node-icon">🔍</div>
+                        <div class="diagram-node-label">Crawler</div>
+                        <div class="diagram-node-sub">Clone & Index</div>
+                    </div>
+                    
+                    <div class="diagram-arrow">→</div>
+                    
+                    <div class="diagram-node highlight">
+                        <div class="diagram-node-icon">🧠</div>
+                        <div class="diagram-node-label">AI Analyzer</div>
+                        <div class="diagram-node-sub">Claude / Patterns</div>
+                    </div>
+                    
+                    <div class="diagram-arrow">→</div>
+                    
+                    <div class="diagram-node">
+                        <div class="diagram-node-icon">📚</div>
+                        <div class="diagram-node-label">Knowledge Base</div>
+                        <div class="diagram-node-sub">Indexed & Embedded</div>
+                    </div>
+                    
+                    <div class="diagram-arrow">→</div>
+                    
+                    <div class="diagram-group">
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">🤖</div>
+                            <div class="diagram-node-label">AI Agents</div>
+                        </div>
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">🔎</div>
+                            <div class="diagram-node-label">Search API</div>
+                        </div>
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">📖</div>
+                            <div class="diagram-node-label">Docs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="steps fade-in">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Connect Your GitLab</h3>
+                    <p>Point ContextPedia at your self-hosted GitLab. It discovers all repositories you have access to automatically.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Analyze with AI</h3>
+                    <p>Choose pattern-based extraction (fast & free) or LLM analysis (Claude) for deeper business logic understanding.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Generate Knowledge</h3>
+                    <p>Outputs structured JSON, human-readable Markdown docs, and vector embeddings for semantic search.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Query Anything</h3>
+                    <p>Use the REST API, semantic search, or browse docs. Ask natural questions like "how does payment processing work?"</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section id="features">
+            <div class="section-header fade-in">
+                <span class="section-tag">Features</span>
+                <h2>Everything You Need</h2>
+                <p>Comprehensive code intelligence for modern engineering teams</p>
+            </div>
+
+            <div class="features-grid fade-in">
+                <div class="feature">
+                    <div class="feature-icon">🔮</div>
+                    <h3>LLM-Powered Extraction</h3>
+                    <p>Claude understands business context, not just syntax. Infers domains, patterns, and potential concerns.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🌐</div>
+                    <h3>Language Agnostic</h3>
+                    <p>Java, Python, Go, JavaScript, TypeScript — one system handles all your languages seamlessly.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Relationship Mapping</h3>
+                    <p>Automatically discovers how services connect, which entities relate, and how data flows through your system.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Semantic Search</h3>
+                    <p>Ask questions in plain English. Find relevant code without knowing exact names or file locations.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📡</div>
+                    <h3>REST API</h3>
+                    <p>Full-featured API for integration with AI agents, chat tools, IDEs, and custom applications.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📄</div>
+                    <h3>Auto Documentation</h3>
+                    <p>Generates Markdown docs with cross-references, making it easy for humans to browse and understand.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Smart Caching</h3>
+                    <p>LLM results are cached by content hash. Changed files get re-analyzed; unchanged files are instant.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Private & Secure</h3>
+                    <p>Runs on your infrastructure. Your code never leaves your network except for optional LLM calls.</p>
+                </div>
+            </div>
+
+            <div class="code-block fade-in">
+                <span class="comment"># Extract knowledge from your repos</span><br>
+                <span class="command">contextpedia</span> <span class="flag">--full --llm</span><br><br>
+                <span class="comment"># Search with natural language</span><br>
+                <span class="command">curl</span> "http://localhost:8000/ask?q=how+does+user+authentication+work"<br><br>
+                <span class="comment"># Get schema details</span><br>
+                <span class="command">curl</span> "http://localhost:8000/schemas/User/relationships"
+            </div>
+        </section>
+
+        <!-- Benefits -->
+        <section id="benefits">
+            <div class="section-header fade-in">
+                <span class="section-tag">Benefits</span>
+                <h2>Why Teams Love ContextPedia</h2>
+                <p>Real impact on developer productivity and AI effectiveness</p>
+            </div>
+
+            <div class="benefits-grid fade-in">
+                <div class="benefit">
+                    <div class="benefit-icon">⏱️</div>
+                    <div>
+                        <h3>Faster Onboarding</h3>
+                        <p>New developers understand the system in days, not weeks. Everything is documented and searchable.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🤖</div>
+                    <div>
+                        <h3>Smarter AI Agents</h3>
+                        <p>Give your AI tools real context about your business logic. RAG pipelines get the right information.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🎯</div>
+                    <div>
+                        <h3>Find Anything Fast</h3>
+                        <p>"Where do we handle refunds?" — get answers instantly without digging through 200 repos.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">📊</div>
+                    <div>
+                        <h3>System Visibility</h3>
+                        <p>See how services connect, which schemas are shared, and where dependencies are used.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">🔄</div>
+                    <div>
+                        <h3>Always Up to Date</h3>
+                        <p>Run periodically to keep knowledge fresh. Caching makes incremental updates fast and cheap.</p>
+                    </div>
+                </div>
+                <div class="benefit">
+                    <div class="benefit-icon">💡</div>
+                    <div>
+                        <h3>Business Context</h3>
+                        <p>LLM extraction understands that PaymentService handles financial transactions, not just "has methods".</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology -->
+        <section id="technology">
+            <div class="section-header fade-in">
+                <span class="section-tag">Technology</span>
+                <h2>Built With Modern Tools</h2>
+                <p>Enterprise-grade tech stack for reliability and performance</p>
+            </div>
+
+            <div class="tech-grid fade-in">
+                <div class="tech-card">
+                    <div class="tech-card-icon">🐍</div>
+                    <h4>Python</h4>
+                    <p>Core runtime</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">🦊</div>
+                    <h4>GitLab API</h4>
+                    <p>Repo discovery</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">🧠</div>
+                    <h4>Claude AI</h4>
+                    <p>Code understanding</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">⚡</div>
+                    <h4>FastAPI</h4>
+                    <p>REST endpoints</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">🔮</div>
+                    <h4>ChromaDB</h4>
+                    <p>Vector storage</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">🤗</div>
+                    <h4>Sentence Transformers</h4>
+                    <p>Embeddings</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta">
+            <h2 class="fade-in">Ready to Understand Your Codebase?</h2>
+            <p class="fade-in">Start extracting knowledge from your repositories today.</p>
+            <div class="hero-buttons fade-in">
+                <a href="#" class="btn btn-primary">Get Started →</a>
+                <a href="#" class="btn btn-secondary">View Documentation</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>ContextPedia — Your codebase, understood. Built for modern engineering teams.</p>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Parallax effect for background glows
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.querySelector('.bg-glow-1').style.transform = 
+                `translate(${x * 30}px, ${y * 30}px)`;
+            document.querySelector('.bg-glow-2').style.transform = 
+                `translate(${-x * 30}px, ${-y * 30}px)`;
+        });
+    </script>
+</body>
+</html>

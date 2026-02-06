@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contextpedia"
+version = "0.1.0"
+description = "Extract knowledge from GitLab repositories for AI agents"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "PRIVATE"}
+authors = [
+    {name = "Shaidar"}
+]
+dependencies = [
+    "python-gitlab>=4.0.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "gitpython>=3.1.0",
+]
+
+[project.optional-dependencies]
+vectors = [
+    "sentence-transformers>=2.2.0",
+    "chromadb>=0.4.0",
+    "tiktoken>=0.5.0",
+]
+api = [
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "httpx>=0.26.0",
+]
+full = [
+    "contextpedia[vectors]",
+    "contextpedia[api]",
+    "tree-sitter>=0.21.0",
+    "whoosh>=2.7.4",
+]
+
+[project.scripts]
+contextpedia = "src.main:main"
+cpedia-search = "src.query.search:main"
+cpedia-semantic = "src.query.embeddings:main"
+cpedia-api = "src.api.server:main"
+cpedia-llm = "src.extractors.llm_extractor:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

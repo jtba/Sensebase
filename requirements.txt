@@ -1,0 +1,37 @@
+# GitLab API
+python-gitlab>=4.0.0
+
+# Code Analysis
+tree-sitter>=0.21.0
+tree-sitter-java>=0.21.0
+tree-sitter-python>=0.21.0
+tree-sitter-go>=0.21.0
+tree-sitter-javascript>=0.21.0
+
+# Schema Detection
+sqlparse>=0.4.4
+pyyaml>=6.0
+toml>=0.10.2
+
+# Dependency Parsing
+packaging>=23.0
+requirements-parser>=0.5.0
+
+# Vector/Embeddings
+sentence-transformers>=2.2.0
+chromadb>=0.4.0
+tiktoken>=0.5.0
+
+# Search & Query
+whoosh>=2.7.4
+
+# REST API
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Utilities
+rich>=13.0.0
+pydantic>=2.0.0
+httpx>=0.26.0
+gitpython>=3.1.0
+pathspec>=0.11.0

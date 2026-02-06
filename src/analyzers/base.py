@@ -1,0 +1,132 @@
+"""Base analyzer interface."""
+
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+
+@dataclass
+class SchemaInfo:
+    """Extracted schema information."""
+    name: str
+    type: str  # "table", "model", "entity", "type", "interface"
+    source_file: str
+    fields: list[dict[str, Any]]  # name, type, constraints, description
+    relationships: list[dict[str, Any]]  # type, target, description
+    raw_definition: str | None = None
+
+
+@dataclass
+class DependencyInfo:
+    """Extracted dependency information."""
+    name: str
+    version: str | None
+    type: str  # "runtime", "dev", "optional", "peer"
+    source_file: str
+    ecosystem: str  # "maven", "pip", "npm", "go"
+
+
+@dataclass
+class BusinessLogicInfo:
+    """Extracted business logic information."""
+    name: str
+    type: str  # "service", "handler", "rule", "workflow", "validator"
+    source_file: str
+    description: str | None
+    methods: list[dict[str, Any]]  # name, params, returns, docstring
+    dependencies: list[str]  # other services/components used
+    data_accessed: list[str]  # schemas/entities this touches
+
+
+@dataclass
+class APIInfo:
+    """Extracted API endpoint information."""
+    path: str
+    method: str
+    source_file: str
+    handler: str
+    params: list[dict[str, Any]]
+    request_body: dict[str, Any] | None
+    response: dict[str, Any] | None
+    description: str | None
+
+
+@dataclass
+class DataFlowInfo:
+    """Data flow between components."""
+    source: str  # source component/entity
+    target: str  # target component/entity
+    type: str  # "read", "write", "transform", "publish", "subscribe"
+    description: str | None
+    source_file: str
+
+
+@dataclass
+class AnalysisResult:
+    """Combined analysis results for a repository."""
+    repo_path: str
+    repo_name: str
+    
+    schemas: list[SchemaInfo] = field(default_factory=list)
+    dependencies: list[DependencyInfo] = field(default_factory=list)
+    business_logic: list[BusinessLogicInfo] = field(default_factory=list)
+    apis: list[APIInfo] = field(default_factory=list)
+    data_flows: list[DataFlowInfo] = field(default_factory=list)
+    
+    # Metadata
+    languages: dict[str, float] = field(default_factory=dict)
+    file_count: int = 0
+    analyzed_files: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    
+    def merge(self, other: "AnalysisResult") -> None:
+        """Merge another result into this one."""
+        self.schemas.extend(other.schemas)
+        self.dependencies.extend(other.dependencies)
+        self.business_logic.extend(other.business_logic)
+        self.apis.extend(other.apis)
+        self.data_flows.extend(other.data_flows)
+        self.analyzed_files.extend(other.analyzed_files)
+        self.errors.extend(other.errors)
+
+
+class Analyzer(ABC):
+    """Base class for code analyzers."""
+    
+    # File extensions this analyzer handles
+    extensions: list[str] = []
+    
+    # Language name
+    language: str = "unknown"
+    
+    @abstractmethod
+    def analyze_file(self, file_path: Path, content: str) -> AnalysisResult:
+        """Analyze a single file and extract knowledge."""
+        pass
+    
+    def can_handle(self, file_path: Path) -> bool:
+        """Check if this analyzer can handle the given file."""
+        return file_path.suffix.lower() in self.extensions
+    
+    def analyze_directory(self, dir_path: Path) -> AnalysisResult:
+        """Analyze all relevant files in a directory."""
+        result = AnalysisResult(
+            repo_path=str(dir_path),
+            repo_name=dir_path.name,
+        )
+        
+        for file_path in dir_path.rglob("*"):
+            if not file_path.is_file():
+                continue
+            if not self.can_handle(file_path):
+                continue
+            
+            try:
+                content = file_path.read_text(encoding="utf-8", errors="ignore")
+                file_result = self.analyze_file(file_path, content)
+                result.merge(file_result)
+            except Exception as e:
+                result.errors.append(f"{file_path}: {e}")
+        
+        return result

@@ -1,0 +1,112 @@
+# GitLab Configuration
+# Copy to gitlab.yaml and fill in your values
+
+gitlab:
+  # Your self-hosted GitLab URL
+  url: "https://gitlab.yourcompany.com"
+  
+  # Personal Access Token with api scope
+  # Create at: Settings > Access Tokens
+  token: "glpat-xxxxxxxxxxxxxxxxxxxx"
+  
+  # Optional: Only crawl specific groups/namespaces
+  # Leave empty to crawl all accessible repos
+  namespaces:
+    # - "group-name"
+    # - "group-name/subgroup"
+  
+  # Exclude patterns (regex)
+  exclude_patterns:
+    - "^archived-.*"
+    - ".*-deprecated$"
+    - "^sandbox/"
+  
+  # Clone settings
+  clone:
+    # Where to store cloned repos locally
+    base_path: "./repos"
+    # Clone depth (0 = full history, 1 = shallow)
+    depth: 1
+    # Max concurrent clones
+    concurrency: 5
+
+# Analysis settings
+analysis:
+  # File size limit for analysis (bytes)
+  max_file_size: 1048576  # 1MB
+  
+  # Skip these directories
+  skip_dirs:
+    - "node_modules"
+    - "vendor"
+    - "venv"
+    - ".venv"
+    - "__pycache__"
+    - "target"
+    - "build"
+    - "dist"
+    - ".git"
+  
+  # Focus on these file types
+  include_extensions:
+    # Java
+    - ".java"
+    - ".xml"  # pom.xml, beans
+    - ".gradle"
+    - ".properties"
+    # Python
+    - ".py"
+    - ".pyi"
+    # Go
+    - ".go"
+    - ".mod"
+    # JavaScript/Web
+    - ".js"
+    - ".ts"
+    - ".jsx"
+    - ".tsx"
+    - ".html"
+    - ".css"
+    - ".scss"
+    - ".vue"
+    # Config/Schema
+    - ".json"
+    - ".yaml"
+    - ".yml"
+    - ".toml"
+    - ".sql"
+    - ".graphql"
+    - ".proto"
+
+# Output settings
+output:
+  # Base directory for generated knowledge
+  base_path: "./output"
+  
+  # Generate these formats
+  formats:
+    json: true
+    markdown: true
+    vectors: true
+  
+  # Vector embedding settings
+  vectors:
+    model: "all-MiniLM-L6-v2"
+    chunk_size: 512
+    chunk_overlap: 50
+
+# LLM extraction settings (optional, use --llm flag)
+llm:
+  # API key (or set ANTHROPIC_API_KEY env var)
+  # api_key: "sk-ant-..."
+  
+  # Model to use for extraction
+  # claude-sonnet-4-20250514 = fast, good for most code
+  # claude-opus-4-20250514 = best quality, slower, higher cost
+  model: "claude-sonnet-4-20250514"
+  
+  # Cache directory for LLM responses (avoids re-processing)
+  cache_dir: "./output/cache/llm"
+  
+  # Rate limiting (requests per minute)
+  requests_per_minute: 50
