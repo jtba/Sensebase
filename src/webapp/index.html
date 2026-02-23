@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SenseBase</title>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='10' r='3' fill='url(%23g)'/%3E%3Ccircle cx='8' cy='22' r='3' fill='url(%23g)'/%3E%3Ccircle cx='24' cy='22' r='3' fill='url(%23g)'/%3E%3Ccircle cx='24' cy='12' r='2' fill='url(%23g)' opacity='0.6'/%3E%3Ccircle cx='6' cy='14' r='2' fill='url(%23g)' opacity='0.6'/%3E%3Cline x1='16' y1='10' x2='8' y2='22' stroke='%233b82f6' stroke-width='1.5' opacity='0.7'/%3E%3Cline x1='16' y1='10' x2='24' y2='22' stroke='%238b5cf6' stroke-width='1.5' opacity='0.7'/%3E%3Cline x1='8' y1='22' x2='24' y2='22' stroke='%2314b8a6' stroke-width='1.5' opacity='0.7'/%3E%3Cline x1='16' y1='10' x2='24' y2='12' stroke='%233b82f6' stroke-width='1' opacity='0.4'/%3E%3Cline x1='16' y1='10' x2='6' y2='14' stroke='%238b5cf6' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: { DEFAULT: '#12121a', dark: '#0a0a0f', light: '#1a1a2e' },
+            border: { DEFAULT: '#1e1e2e', light: '#2a2a3e' },
+            accent: { blue: '#3b82f6', purple: '#8b5cf6', teal: '#14b8a6', amber: '#f59e0b' }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- D3.js -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="/static/css/app.css">
+
+  <!-- ES Module Importmap -->
+  <script type="importmap">
+  {
+    "imports": {
+      "vue": "https://unpkg.com/vue@3.4/dist/vue.esm-browser.prod.js",
+      "vue-router": "https://unpkg.com/vue-router@4.3/dist/vue-router.esm-browser.js",
+      "@vue/devtools-api": "https://unpkg.com/@vue/devtools-api@6.6/lib/esm/index.js"
+    }
+  }
+  </script>
+</head>
+<body class="bg-surface-dark text-gray-200 font-sans antialiased">
+  <div id="app"></div>
+  <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

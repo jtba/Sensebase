@@ -9,7 +9,7 @@ from pathlib import Path
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
-from .gitlab_client import RepoInfo
+from .models import RepoInfo
 
 console = Console()
 

@@ -3,17 +3,18 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "contextpedia"
+name = "sensebase"
 version = "0.1.0"
 description = "Extract knowledge from GitLab repositories for AI agents"
 readme = "README.md"
-requires-python = ">=3.11"
-license = {text = "PRIVATE"}
+requires-python = ">=3.10"
+license = {text = "MIT"}
 authors = [
-    {name = "Shaidar"}
+    {name = "Jason Baldwin"}
 ]
 dependencies = [
     "python-gitlab>=4.0.0",
+    "PyGithub>=2.0.0",
     "pyyaml>=6.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",
@@ -32,18 +33,30 @@ api = [
     "httpx>=0.26.0",
 ]
 full = [
-    "contextpedia[vectors]",
-    "contextpedia[api]",
+    "sensebase[vectors]",
+    "sensebase[api]",
     "tree-sitter>=0.21.0",
     "whoosh>=2.7.4",
 ]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.4.0",
+]
 
 [project.scripts]
-contextpedia = "src.main:main"
-cpedia-search = "src.query.search:main"
-cpedia-semantic = "src.query.embeddings:main"
-cpedia-api = "src.api.server:main"
-cpedia-llm = "src.extractors.llm_extractor:main"
+sensebase = "src.main:main"
+sb-search = "src.query.search:main"
+sb-semantic = "src.query.embeddings:main"
+sb-api = "src.api.server:main"
+sb-llm = "src.extractors.llm_extractor:main"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContextPedia — Your Codebase, Understood</title>
+    <title>SenseBase — Your Codebase, Understood</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: 
+            background-image:
                 linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
@@ -191,7 +191,7 @@
         .hero p {
             font-size: 1.25rem;
             color: var(--text-secondary);
-            max-width: 600px;
+            max-width: 650px;
             margin-bottom: 2.5rem;
         }
 
@@ -329,7 +329,7 @@
             align-items: center;
             justify-content: center;
             gap: 1rem;
-            min-width: 800px;
+            min-width: 900px;
             padding: 1rem 0;
         }
 
@@ -466,10 +466,45 @@
             font-size: 0.9rem;
         }
 
+        /* Dashboard showcase */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+
+        .dashboard-card {
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .dashboard-card:hover {
+            border-color: var(--accent);
+        }
+
+        .dashboard-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .dashboard-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .dashboard-card p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
         /* Tech stack */
         .tech-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 1.5rem;
         }
 
@@ -641,9 +676,10 @@
     <div class="bg-glow bg-glow-2"></div>
 
     <nav>
-        <div class="logo">ContextPedia</div>
+        <div class="logo">SenseBase</div>
         <ul class="nav-links">
             <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#benefits">Benefits</a></li>
             <li><a href="#technology">Technology</a></li>
@@ -662,16 +698,16 @@
                 <span class="gradient">Searchable Knowledge</span>
             </h1>
             <p>
-                ContextPedia crawls your repositories and extracts business logic, 
-                data schemas, and system relationships — creating a single source of truth 
-                that AI agents and humans can actually understand.
+                SenseBase crawls your GitHub, GitLab, or local repositories and extracts
+                schemas, APIs, services, and business context — creating a semantic knowledge base
+                that AI agents and humans can search, explore, and query.
             </p>
             <div class="hero-buttons">
                 <a href="#how-it-works" class="btn btn-primary">
-                    See How It Works →
+                    See How It Works
                 </a>
-                <a href="#features" class="btn btn-secondary">
-                    Explore Features
+                <a href="#dashboard" class="btn btn-secondary">
+                    Explore the Dashboard
                 </a>
             </div>
 
@@ -679,12 +715,12 @@
                 <div class="card">
                     <div class="card-icon">😵</div>
                     <h3>The Problem</h3>
-                    <p>Knowledge is scattered across 200+ repositories. New developers spend weeks understanding the system. AI tools lack context about your business logic.</p>
+                    <p>Knowledge is scattered across repositories. New developers spend weeks understanding the system. AI tools know your code structure but not what it means for the business.</p>
                 </div>
                 <div class="card">
                     <div class="card-icon">✨</div>
                     <h3>The Solution</h3>
-                    <p>ContextPedia extracts and connects everything — schemas, APIs, services, dependencies — into a unified, searchable knowledge base.</p>
+                    <p>SenseBase extracts structural metadata and enriches it with business semantics — a glossary, entity descriptions, field-level documentation, and query recipes that AI agents can use to autonomously answer questions.</p>
                 </div>
             </div>
         </section>
@@ -694,55 +730,64 @@
             <div class="section-header fade-in">
                 <span class="section-tag">How It Works</span>
                 <h2>From Code to Knowledge in Minutes</h2>
-                <p>A simple pipeline that transforms scattered code into structured, queryable intelligence</p>
+                <p>A pipeline that transforms scattered code into structured, queryable intelligence</p>
             </div>
 
             <div class="diagram-container fade-in">
                 <div class="diagram">
-                    <div class="diagram-node">
-                        <div class="diagram-node-icon">🗄️</div>
-                        <div class="diagram-node-label">GitLab</div>
-                        <div class="diagram-node-sub">Your Repositories</div>
+                    <div class="diagram-group">
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">🐙</div>
+                            <div class="diagram-node-label">GitHub</div>
+                        </div>
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">🦊</div>
+                            <div class="diagram-node-label">GitLab</div>
+                        </div>
+                        <div class="diagram-node">
+                            <div class="diagram-node-icon">📁</div>
+                            <div class="diagram-node-label">Local Dirs</div>
+                        </div>
                     </div>
-                    
-                    <div class="diagram-arrow">→</div>
-                    
+
+                    <div class="diagram-arrow">&rarr;</div>
+
                     <div class="diagram-node">
                         <div class="diagram-node-icon">🔍</div>
                         <div class="diagram-node-label">Crawler</div>
-                        <div class="diagram-node-sub">Clone & Index</div>
+                        <div class="diagram-node-sub">Discover & Clone</div>
                     </div>
-                    
-                    <div class="diagram-arrow">→</div>
-                    
+
+                    <div class="diagram-arrow">&rarr;</div>
+
                     <div class="diagram-node highlight">
                         <div class="diagram-node-icon">🧠</div>
                         <div class="diagram-node-label">AI Analyzer</div>
-                        <div class="diagram-node-sub">Claude / Patterns</div>
+                        <div class="diagram-node-sub">Patterns + LLM</div>
                     </div>
-                    
-                    <div class="diagram-arrow">→</div>
-                    
-                    <div class="diagram-node">
-                        <div class="diagram-node-icon">📚</div>
-                        <div class="diagram-node-label">Knowledge Base</div>
-                        <div class="diagram-node-sub">Indexed & Embedded</div>
+
+                    <div class="diagram-arrow">&rarr;</div>
+
+                    <div class="diagram-node highlight">
+                        <div class="diagram-node-icon">💡</div>
+                        <div class="diagram-node-label">Semantic Layer</div>
+                        <div class="diagram-node-sub">Business Context</div>
                     </div>
-                    
-                    <div class="diagram-arrow">→</div>
-                    
+
+                    <div class="diagram-arrow">&rarr;</div>
+
                     <div class="diagram-group">
                         <div class="diagram-node">
+                            <div class="diagram-node-icon">🖥️</div>
+                            <div class="diagram-node-label">Web Dashboard</div>
+                        </div>
+                        <div class="diagram-node">
                             <div class="diagram-node-icon">🤖</div>
-                            <div class="diagram-node-label">AI Agents</div>
+                            <div class="diagram-node-label">REST API</div>
                         </div>
                         <div class="diagram-node">
                             <div class="diagram-node-icon">🔎</div>
-                            <div class="diagram-node-label">Search API</div>
-                        </div>
-                        <div class="diagram-node">
-                            <div class="diagram-node-icon">📖</div>
-                            <div class="diagram-node-label">Docs</div>
+                            <div class="diagram-node-label">Semantic Search</div>
                         </div>
                     </div>
                 </div>
@@ -751,23 +796,95 @@
             <div class="steps fade-in">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <h3>Connect Your GitLab</h3>
-                    <p>Point ContextPedia at your self-hosted GitLab. It discovers all repositories you have access to automatically.</p>
+                    <h3>Connect Your Repos</h3>
+                    <p>Point SenseBase at GitHub orgs, a GitLab instance, or local directories. It discovers all repositories automatically.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">2</div>
                     <h3>Analyze with AI</h3>
-                    <p>Choose pattern-based extraction (fast & free) or LLM analysis (Claude) for deeper business logic understanding.</p>
+                    <p>Pattern-based extraction (fast, free, deterministic) or LLM-powered analysis (Anthropic, OpenAI, or AWS Bedrock) for deeper business logic understanding. Both cached intelligently.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <h3>Generate Knowledge</h3>
-                    <p>Outputs structured JSON, human-readable Markdown docs, and vector embeddings for semantic search.</p>
+                    <h3>Enrich with Semantics</h3>
+                    <p>An AI-powered semantic layer adds business glossaries, entity descriptions, field documentation, and step-by-step query recipes.</p>
                 </div>
                 <div class="step">
                     <div class="step-number">4</div>
-                    <h3>Query Anything</h3>
-                    <p>Use the REST API, semantic search, or browse docs. Ask natural questions like "how does payment processing work?"</p>
+                    <h3>Explore & Query</h3>
+                    <p>Browse the web dashboard, search with natural language, or integrate with AI agents via the REST API and semantic search endpoints.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard">
+            <div class="section-header fade-in">
+                <span class="section-tag">Web Dashboard</span>
+                <h2>A Complete Knowledge Portal</h2>
+                <p>An interactive web application for exploring your codebase knowledge</p>
+            </div>
+
+            <div class="dashboard-grid fade-in">
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">📊</div>
+                    <h4>Dashboard</h4>
+                    <p>Overview stats for repositories, schemas, APIs, services, and dependencies at a glance</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🔎</div>
+                    <h4>Search</h4>
+                    <p>Three search modes: keyword, semantic (embedding-based), and question-answering with RAG context</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🕸️</div>
+                    <h4>Knowledge Graph</h4>
+                    <p>Interactive force-directed graph showing how schemas, services, APIs, and dependencies connect</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🗂️</div>
+                    <h4>Schema Explorer</h4>
+                    <p>Browse schemas with fields, relationships, business descriptions, and query recipes</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">⚙️</div>
+                    <h4>Service Catalog</h4>
+                    <p>Services with methods, dependencies, and data access patterns across repositories</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🌐</div>
+                    <h4>API Explorer</h4>
+                    <p>Browse REST endpoints by path, method, handler, and repository</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">📦</div>
+                    <h4>Dependencies</h4>
+                    <p>Track external packages across repos with ecosystem grouping and usage analysis</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🔀</div>
+                    <h4>Data Flows</h4>
+                    <p>Visualize how data moves between services and schemas in your system</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">📖</div>
+                    <h4>Service Contexts</h4>
+                    <p>AI-generated business context per repository: purpose, domain, data ownership</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🔗</div>
+                    <h4>Relationships</h4>
+                    <p>Cross-repository service dependencies and data ownership chains</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🚀</div>
+                    <h4>Pipeline Manager</h4>
+                    <p>Trigger crawl jobs from the browser with real-time streaming progress</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">⚙️</div>
+                    <h4>Configuration</h4>
+                    <p>Manage repository sources and LLM provider settings (Anthropic, OpenAI, AWS Bedrock) from the web interface</p>
                 </div>
             </div>
         </section>
@@ -782,54 +899,70 @@
 
             <div class="features-grid fade-in">
                 <div class="feature">
+                    <div class="feature-icon">💡</div>
+                    <h3>Semantic Business Layer</h3>
+                    <p>AI generates business glossaries, entity descriptions, field-level docs, and step-by-step query recipes that tell agents <em>how</em> to answer business questions.</p>
+                </div>
+                <div class="feature">
                     <div class="feature-icon">🔮</div>
                     <h3>LLM-Powered Extraction</h3>
-                    <p>Claude understands business context, not just syntax. Infers domains, patterns, and potential concerns.</p>
+                    <p>Choose from Anthropic, OpenAI, or AWS Bedrock. LLM extraction understands business context, not just syntax &mdash; generating repository context with purpose, domain, data ownership, and usage guidance.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🌐</div>
                     <h3>Language Agnostic</h3>
-                    <p>Java, Python, Go, JavaScript, TypeScript — one system handles all your languages seamlessly.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔗</div>
-                    <h3>Relationship Mapping</h3>
-                    <p>Automatically discovers how services connect, which entities relate, and how data flows through your system.</p>
+                    <p>Java, Python, Go, JavaScript, TypeScript, SQL, Protobuf, GraphQL &mdash; dedicated analyzers for each, plus LLM extraction for any language.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🎯</div>
-                    <h3>Semantic Search</h3>
-                    <p>Ask questions in plain English. Find relevant code without knowing exact names or file locations.</p>
+                    <h3>Three Search Modes</h3>
+                    <p>Keyword search for exact matches, semantic search with vector embeddings, and question-answering with RAG context and query recipe injection.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🕸️</div>
+                    <h3>Knowledge Graph</h3>
+                    <p>Interactive force-directed graph visualizing relationships between schemas, services, APIs, and dependencies. Click to explore, zoom to focus.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Relationship Discovery</h3>
+                    <p>Automatically maps service dependency graphs, schema foreign keys, data ownership chains, and cross-repository integrations.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">📡</div>
-                    <h3>REST API</h3>
-                    <p>Full-featured API for integration with AI agents, chat tools, IDEs, and custom applications.</p>
+                    <h3>Full REST API</h3>
+                    <p>50+ endpoints for schemas, services, APIs, dependencies, search, semantic queries, glossary, recipes &mdash; ready for AI agent integration.</p>
                 </div>
                 <div class="feature">
-                    <div class="feature-icon">📄</div>
-                    <h3>Auto Documentation</h3>
-                    <p>Generates Markdown docs with cross-references, making it easy for humans to browse and understand.</p>
+                    <div class="feature-icon">📁</div>
+                    <h3>Multi-Platform Sources</h3>
+                    <p>GitHub organizations, self-hosted GitLab, or local directories. Mix and match, configure from the web UI or YAML.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">⚡</div>
                     <h3>Smart Caching</h3>
-                    <p>LLM results are cached by content hash. Changed files get re-analyzed; unchanged files are instant.</p>
+                    <p>LLM results cached by content hash. Changed files get re-analyzed; unchanged files are instant. Semantic enrichment cached per repo.</p>
                 </div>
                 <div class="feature">
                     <div class="feature-icon">🔒</div>
                     <h3>Private & Secure</h3>
-                    <p>Runs on your infrastructure. Your code never leaves your network except for optional LLM calls.</p>
+                    <p>Runs on your infrastructure. Your code never leaves your network except for optional LLM calls to your chosen provider (Anthropic, OpenAI, or AWS Bedrock).</p>
                 </div>
             </div>
 
             <div class="code-block fade-in">
-                <span class="comment"># Extract knowledge from your repos</span><br>
-                <span class="command">contextpedia</span> <span class="flag">--full --llm</span><br><br>
-                <span class="comment"># Search with natural language</span><br>
-                <span class="command">curl</span> "http://localhost:8000/ask?q=how+does+user+authentication+work"<br><br>
-                <span class="comment"># Get schema details</span><br>
-                <span class="command">curl</span> "http://localhost:8000/schemas/User/relationships"
+                <span class="comment"># Analyze repos with AI-powered semantic enrichment</span><br>
+                <span class="command">sensebase</span> <span class="flag">--full --llm</span><br><br>
+                <span class="comment"># Ask a business question</span><br>
+                <span class="command">curl</span> "http://localhost:8000/ask?q=how+do+bookings+get+created"<br><br>
+                <span class="comment"># Get the business glossary</span><br>
+                <span class="command">curl</span> "http://localhost:8000/semantic/glossary"<br><br>
+                <span class="comment"># Find query recipes for a topic</span><br>
+                <span class="command">curl</span> "http://localhost:8000/semantic/recipes?q=booking"<br><br>
+                <span class="comment"># Semantic search with natural language</span><br>
+                <span class="command">curl</span> "http://localhost:8000/semantic/search?q=payment+processing"<br><br>
+                <span class="comment"># Schema detail with business context</span><br>
+                <span class="command">curl</span> "http://localhost:8000/schemas/Booking"
             </div>
         </section>
 
@@ -837,51 +970,51 @@
         <section id="benefits">
             <div class="section-header fade-in">
                 <span class="section-tag">Benefits</span>
-                <h2>Why Teams Love ContextPedia</h2>
+                <h2>Why Teams Use SenseBase</h2>
                 <p>Real impact on developer productivity and AI effectiveness</p>
             </div>
 
             <div class="benefits-grid fade-in">
                 <div class="benefit">
-                    <div class="benefit-icon">⏱️</div>
+                    <div class="benefit-icon">🤖</div>
                     <div>
-                        <h3>Faster Onboarding</h3>
-                        <p>New developers understand the system in days, not weeks. Everything is documented and searchable.</p>
+                        <h3>AI Agents That Understand Your Business</h3>
+                        <p>Query recipes give AI step-by-step instructions: "To find top-booked properties, call GET /api/v1/bookings with date filters, group by listing_id." No more hallucinated API paths.</p>
                     </div>
                 </div>
                 <div class="benefit">
-                    <div class="benefit-icon">🤖</div>
+                    <div class="benefit-icon">⏱️</div>
                     <div>
-                        <h3>Smarter AI Agents</h3>
-                        <p>Give your AI tools real context about your business logic. RAG pipelines get the right information.</p>
+                        <h3>Faster Onboarding</h3>
+                        <p>New developers search "how does payment work?" and get business context, schemas, APIs, and service relationships instantly.</p>
                     </div>
                 </div>
                 <div class="benefit">
                     <div class="benefit-icon">🎯</div>
                     <div>
                         <h3>Find Anything Fast</h3>
-                        <p>"Where do we handle refunds?" — get answers instantly without digging through 200 repos.</p>
+                        <p>Three search modes cover every use case: exact keyword matching, semantic similarity for natural language, and Q&A with contextual answers.</p>
                     </div>
                 </div>
                 <div class="benefit">
                     <div class="benefit-icon">📊</div>
                     <div>
                         <h3>System Visibility</h3>
-                        <p>See how services connect, which schemas are shared, and where dependencies are used.</p>
+                        <p>The knowledge graph and relationship views show how services connect, which schemas are shared, and how data flows through your architecture.</p>
                     </div>
                 </div>
                 <div class="benefit">
                     <div class="benefit-icon">🔄</div>
                     <div>
                         <h3>Always Up to Date</h3>
-                        <p>Run periodically to keep knowledge fresh. Caching makes incremental updates fast and cheap.</p>
+                        <p>Re-run the pipeline or trigger a crawl from the web UI. Content-hash caching makes incremental updates fast and cheap.</p>
                     </div>
                 </div>
                 <div class="benefit">
                     <div class="benefit-icon">💡</div>
                     <div>
-                        <h3>Business Context</h3>
-                        <p>LLM extraction understands that PaymentService handles financial transactions, not just "has methods".</p>
+                        <h3>Business Context, Not Just Code</h3>
+                        <p>LLM extraction understands that a Booking represents a confirmed guest reservation, not just "a table with 18 columns."</p>
                     </div>
                 </div>
             </div>
@@ -892,7 +1025,7 @@
             <div class="section-header fade-in">
                 <span class="section-tag">Technology</span>
                 <h2>Built With Modern Tools</h2>
-                <p>Enterprise-grade tech stack for reliability and performance</p>
+                <p>A focused stack for reliability and performance</p>
             </div>
 
             <div class="tech-grid fade-in">
@@ -902,19 +1035,14 @@
                     <p>Core runtime</p>
                 </div>
                 <div class="tech-card">
-                    <div class="tech-card-icon">🦊</div>
-                    <h4>GitLab API</h4>
-                    <p>Repo discovery</p>
+                    <div class="tech-card-icon">⚡</div>
+                    <h4>FastAPI</h4>
+                    <p>REST API & SSE</p>
                 </div>
                 <div class="tech-card">
                     <div class="tech-card-icon">🧠</div>
-                    <h4>Claude AI</h4>
-                    <p>Code understanding</p>
-                </div>
-                <div class="tech-card">
-                    <div class="tech-card-icon">⚡</div>
-                    <h4>FastAPI</h4>
-                    <p>REST endpoints</p>
+                    <h4>Multi-LLM</h4>
+                    <p>Anthropic, OpenAI, Bedrock</p>
                 </div>
                 <div class="tech-card">
                     <div class="tech-card-icon">🔮</div>
@@ -926,22 +1054,39 @@
                     <h4>Sentence Transformers</h4>
                     <p>Embeddings</p>
                 </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">💚</div>
+                    <h4>Vue 3</h4>
+                    <p>Web dashboard</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">📊</div>
+                    <h4>D3.js</h4>
+                    <p>Knowledge graph</p>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-card-icon">🎨</div>
+                    <h4>Tailwind CSS</h4>
+                    <p>UI styling</p>
+                </div>
             </div>
         </section>
 
         <!-- CTA -->
         <section class="cta">
             <h2 class="fade-in">Ready to Understand Your Codebase?</h2>
-            <p class="fade-in">Start extracting knowledge from your repositories today.</p>
-            <div class="hero-buttons fade-in">
-                <a href="#" class="btn btn-primary">Get Started →</a>
-                <a href="#" class="btn btn-secondary">View Documentation</a>
+            <p class="fade-in">Run the interactive setup, point at your repos, and start exploring in minutes.</p>
+            <div class="code-block fade-in" style="max-width: 500px; margin: 0 auto 2rem; text-align: left;">
+                <span class="command">git clone</span> &lt;repo&gt; && <span class="command">cd</span> sensebase<br>
+                <span class="command">./setup.sh</span><br>
+                <span class="command">sensebase</span> <span class="flag">--full --llm</span><br>
+                <span class="command">sb-api</span> <span class="flag">--port 8000</span>
             </div>
         </section>
     </main>
 
     <footer>
-        <p>ContextPedia — Your codebase, understood. Built for modern engineering teams.</p>
+        <p>SenseBase &mdash; Your codebase, understood. Built for modern engineering teams.</p>
     </footer>
 
     <script>
@@ -981,10 +1126,10 @@
         document.addEventListener('mousemove', (e) => {
             const x = e.clientX / window.innerWidth;
             const y = e.clientY / window.innerHeight;
-            
-            document.querySelector('.bg-glow-1').style.transform = 
+
+            document.querySelector('.bg-glow-1').style.transform =
                 `translate(${x * 30}px, ${y * 30}px)`;
-            document.querySelector('.bg-glow-2').style.transform = 
+            document.querySelector('.bg-glow-2').style.transform =
                 `translate(${-x * 30}px, ${-y * 30}px)`;
         });
     </script>

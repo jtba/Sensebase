@@ -80,7 +80,7 @@ class SemanticSearch:
         """Get or create the knowledge collection."""
         if self._collection is None:
             self._collection = self.client.get_or_create_collection(
-                name="contextpedia",
+                name="sensebase",
                 metadata={"hnsw:space": "cosine"}
             )
         return self._collection
@@ -101,20 +101,21 @@ class SemanticSearch:
         
         console.print(f"[blue]Indexing {len(chunks)} chunks...[/blue]")
         
-        # Prepare data for ChromaDB
-        ids = []
-        documents = []
-        metadatas = []
-        
+        # Prepare data for ChromaDB (deduplicate by ID, last wins)
+        seen = {}
         for chunk in chunks:
             chunk_id = chunk.get("id", "")
             text = chunk.get("text", "")
-            
             if not chunk_id or not text:
                 continue
-            
+            seen[chunk_id] = chunk
+
+        ids = []
+        documents = []
+        metadatas = []
+        for chunk_id, chunk in seen.items():
             ids.append(chunk_id)
-            documents.append(text)
+            documents.append(chunk["text"])
             metadatas.append({
                 "type": chunk.get("type", "unknown"),
                 "name": chunk.get("name", ""),
@@ -308,7 +309,7 @@ def main():
     """CLI for semantic search."""
     import argparse
     
-    parser = argparse.ArgumentParser(description="Semantic search for ContextPedia")
+    parser = argparse.ArgumentParser(description="Semantic search for SenseBase")
     parser.add_argument("query", nargs="?", help="Search query")
     parser.add_argument("--index", help="Index chunks from JSON file")
     parser.add_argument("--model", default="all-MiniLM-L6-v2", help="Embedding model")

@@ -1,4 +1,4 @@
-"""REST API layer for ContextPedia."""
+"""REST API layer for SenseBase."""
 
 from .server import create_app
 

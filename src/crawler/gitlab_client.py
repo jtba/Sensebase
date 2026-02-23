@@ -1,32 +1,16 @@
 """GitLab API client for repository discovery and access."""
 
 import re
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Iterator
 
 import gitlab
 from rich.console import Console
-from rich.progress import Progress, TaskID
+
+from .models import RepoInfo
 
 console = Console()
 
 
-@dataclass
-class RepoInfo:
-    """Repository metadata."""
-    id: int
-    name: str
-    path: str
-    full_path: str
-    description: str | None
-    default_branch: str
-    http_url: str
-    ssh_url: str
-    languages: dict[str, float]
-    topics: list[str]
-    last_activity: str
-    
 
 class GitLabClient:
     """Client for interacting with GitLab API."""

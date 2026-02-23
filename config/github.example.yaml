@@ -1,26 +1,23 @@
-# GitLab Configuration
-# Copy to gitlab.yaml and fill in your values
+# GitHub Configuration
+# Copy to config.yaml and fill in your values
 
-gitlab:
-  # Your self-hosted GitLab URL
-  url: "https://gitlab.yourcompany.com"
-  
-  # Personal Access Token with api scope
-  # Create at: Settings > Access Tokens
-  token: "glpat-xxxxxxxxxxxxxxxxxxxx"
-  
-  # Optional: Only crawl specific groups/namespaces
-  # Leave empty to crawl all accessible repos
-  namespaces:
-    # - "group-name"
-    # - "group-name/subgroup"
-  
-  # Exclude patterns (regex)
+github:
+  # Personal Access Token (classic) with repo scope
+  # Create at: Settings > Developer settings > Personal access tokens
+  token: "ghp_xxxxxxxxxxxxxxxxxxxx"
+
+  # Optional: Only crawl specific organizations
+  # Leave empty to crawl all accessible repos (including personal)
+  orgs:
+    # - "my-org"
+    # - "another-org"
+
+  # Exclude patterns (regex, matched against "owner/repo-name")
   exclude_patterns:
     - "^archived-.*"
     - ".*-deprecated$"
-    - "^sandbox/"
-  
+    - ".*-fork$"
+
   # Clone settings
   clone:
     # Where to store cloned repos locally
@@ -34,7 +31,7 @@ gitlab:
 analysis:
   # File size limit for analysis (bytes)
   max_file_size: 1048576  # 1MB
-  
+
   # Skip these directories
   skip_dirs:
     - "node_modules"
@@ -46,7 +43,7 @@ analysis:
     - "build"
     - "dist"
     - ".git"
-  
+
   # Focus on these file types
   include_extensions:
     # Java
@@ -82,13 +79,13 @@ analysis:
 output:
   # Base directory for generated knowledge
   base_path: "./output"
-  
+
   # Generate these formats
   formats:
     json: true
     markdown: true
     vectors: true
-  
+
   # Vector embedding settings
   vectors:
     model: "all-MiniLM-L6-v2"
@@ -99,14 +96,14 @@ output:
 llm:
   # API key (or set ANTHROPIC_API_KEY env var)
   # api_key: ""
-  
+
   # Model to use for extraction
   # claude-sonnet-4-20250514 = fast, good for most code
   # claude-opus-4-20250514 = best quality, slower, higher cost
   model: "claude-sonnet-4-20250514"
-  
+
   # Cache directory for LLM responses (avoids re-processing)
   cache_dir: "./output/cache/llm"
-  
+
   # Rate limiting (requests per minute)
   requests_per_minute: 50

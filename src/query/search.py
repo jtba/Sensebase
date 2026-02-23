@@ -37,8 +37,10 @@ class SearchEngine:
         for schema in self.data.get("schemas", []):
             score = self._score_match(query_lower, [
                 schema.get("name", ""),
+                schema.get("description", "") or "",
                 *[f.get("name", "") for f in schema.get("fields", [])],
                 *[f.get("type", "") for f in schema.get("fields", [])],
+                *[f.get("description", "") or "" for f in schema.get("fields", [])],
             ])
             if score > 0:
                 results.append({
@@ -93,6 +95,21 @@ class SearchEngine:
                     "data": dep,
                 })
         
+        # Search query recipes
+        for sl in self.data.get("semantic_layers", []):
+            for recipe in sl.get("query_recipes", []):
+                score = self._score_match(query_lower, [
+                    recipe.get("question", ""),
+                    recipe.get("answer_format", ""),
+                ])
+                if score > 0:
+                    results.append({
+                        "type": "recipe",
+                        "name": recipe.get("question", ""),
+                        "score": score * 1.5,  # Boost recipes — they directly answer questions
+                        "data": {**recipe, "repo": sl.get("repo_name", "")},
+                    })
+
         # Sort by score and limit
         results.sort(key=lambda x: x["score"], reverse=True)
         return results[:limit]
@@ -247,7 +264,7 @@ def main():
     """CLI for searching the knowledge base."""
     import argparse
     
-    parser = argparse.ArgumentParser(description="Search the ContextPedia knowledge base")
+    parser = argparse.ArgumentParser(description="Search the SenseBase knowledge base")
     parser.add_argument("query", nargs="?", help="Search query")
     parser.add_argument("--kb", default="./output/json/knowledge_base.json", help="Knowledge base path")
     parser.add_argument("--schema", help="Find schema by name")

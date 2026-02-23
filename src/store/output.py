@@ -25,6 +25,7 @@ class OutputGenerator:
         self.generate_json()
         self.generate_markdown()
         self.generate_vector_chunks()
+        self.generate_contexts()
     
     def generate_json(self) -> None:
         """Generate JSON output for AI agents."""
@@ -72,7 +73,7 @@ class OutputGenerator:
         """Generate main index file."""
         summary = self.kb.get_summary()
         
-        content = f"""# ContextPedia Knowledge Base
+        content = f"""# SenseBase Knowledge Base
 
 Generated: {summary['generated_at']}
 
@@ -153,16 +154,30 @@ Generated: {summary['generated_at']}
             content += f"- **Type:** {schema.get('type', 'unknown')}\n"
             content += f"- **Source:** `{schema.get('source_file', 'unknown')}`\n"
             content += f"- **Repository:** {schema.get('repo', 'unknown')}\n\n"
-            
+
+            if schema.get("description"):
+                content += f"### Business Meaning\n\n{schema['description']}\n\n"
+            if schema.get("business_context"):
+                content += f"{schema['business_context']}\n\n"
+
             # Fields
             fields = schema.get("fields", [])
+            has_descriptions = any(f.get("description") for f in fields)
             if fields:
                 content += "### Fields\n\n"
-                content += "| Name | Type | Constraints |\n"
-                content += "|------|------|-------------|\n"
-                for field in fields:
-                    constraints = ", ".join(field.get("constraints", [])) or "-"
-                    content += f"| {field.get('name', '-')} | {field.get('type', '-')} | {constraints} |\n"
+                if has_descriptions:
+                    content += "| Name | Type | Constraints | Description |\n"
+                    content += "|------|------|-------------|-------------|\n"
+                    for field in fields:
+                        constraints = ", ".join(field.get("constraints", [])) or "-"
+                        desc = field.get("description", "-") or "-"
+                        content += f"| {field.get('name', '-')} | {field.get('type', '-')} | {constraints} | {desc} |\n"
+                else:
+                    content += "| Name | Type | Constraints |\n"
+                    content += "|------|------|-------------|\n"
+                    for field in fields:
+                        constraints = ", ".join(field.get("constraints", [])) or "-"
+                        content += f"| {field.get('name', '-')} | {field.get('type', '-')} | {constraints} |\n"
                 content += "\n"
             
             # Relationships
@@ -305,6 +320,31 @@ Generated: {summary['generated_at']}
             index_content += "\n"
         (dep_dir / "index.md").write_text(index_content)
     
+    def generate_contexts(self) -> None:
+        """Generate context.md files per repo and relationships.json."""
+        contexts = self.kb.get_all_contexts()
+        if not contexts:
+            return
+
+        context_dir = self.output_dir / "context"
+        context_dir.mkdir(exist_ok=True)
+
+        for ctx in contexts:
+            repo_name = ctx.get("repo_name", "unknown")
+            repo_dir = context_dir / self._safe_filename(repo_name)
+            repo_dir.mkdir(exist_ok=True)
+            (repo_dir / "context.md").write_text(ctx.get("context_markdown", ""))
+            console.print(f"[green]\u2713[/green] Generated context for {repo_name}")
+
+        relationships = self.kb.get_relationships()
+        if relationships:
+            (context_dir / "relationships.json").write_text(
+                json.dumps(relationships, indent=2, default=str)
+            )
+            console.print(f"[green]\u2713[/green] Generated relationships.json")
+
+        console.print(f"[green]\u2713[/green] Generated {len(contexts)} context files in {context_dir}")
+
     def generate_vector_chunks(self) -> None:
         """Generate chunks for vector embedding."""
         vector_dir = self.output_dir / "vectors"
@@ -346,6 +386,63 @@ Generated: {summary['generated_at']}
                 "text": text,
             })
         
+        # Chunk contexts
+        for ctx in self.kb.get_all_contexts():
+            repo_name = ctx.get("repo_name", "unknown")
+            text = f"Repository Context: {repo_name}\n"
+            text += f"Purpose: {ctx.get('purpose', '')}\n"
+            text += f"Domain: {ctx.get('domain', '')}\n"
+            if ctx.get("when_to_use"):
+                text += "When to use:\n"
+                for condition in ctx["when_to_use"]:
+                    text += f"  - {condition}\n"
+            if ctx.get("data_ownership"):
+                text += "Data ownership:\n"
+                for entity in ctx["data_ownership"]:
+                    text += f"  - {entity.get('entity', '?')}: {entity.get('description', '')}\n"
+            chunks.append({
+                "id": f"context:{repo_name}",
+                "type": "context",
+                "name": repo_name,
+                "repo": repo_name,
+                "text": text,
+            })
+
+        # Chunk semantic layers (glossary + recipes)
+        for sl in self.kb.get_all_semantic_layers():
+            repo_name = sl.get("repo_name", "unknown")
+
+            if sl.get("business_glossary"):
+                text = f"Business Glossary for {repo_name}\n"
+                for entry in sl["business_glossary"]:
+                    text += f"\n{entry.get('term', '?')}: {entry.get('definition', '')}"
+                    if entry.get("related_schemas"):
+                        text += f"\n  Related schemas: {', '.join(entry['related_schemas'])}"
+                    if entry.get("related_apis"):
+                        text += f"\n  Related APIs: {', '.join(entry['related_apis'])}"
+                chunks.append({
+                    "id": f"glossary:{repo_name}",
+                    "type": "glossary",
+                    "name": repo_name,
+                    "repo": repo_name,
+                    "text": text,
+                })
+
+            for i, recipe in enumerate(sl.get("query_recipes", [])):
+                text = f"Query Recipe: {recipe.get('question', '')}\n"
+                text += f"Repository: {repo_name}\n"
+                for step in recipe.get("steps", []):
+                    text += f"  Step: {step.get('action', '')} ({step.get('service', '')})\n"
+                    text += f"  Purpose: {step.get('purpose', '')}\n"
+                text += f"Answer format: {recipe.get('answer_format', '')}\n"
+                chunks.append({
+                    "id": f"recipe:{repo_name}:{i}",
+                    "type": "recipe",
+                    "name": recipe.get("question", ""),
+                    "repo": repo_name,
+                    "text": text,
+                })
+
         # Save chunks
         (vector_dir / "chunks.json").write_text(
             json.dumps(chunks, indent=2, default=str)
@@ -357,18 +454,25 @@ Generated: {summary['generated_at']}
         """Convert schema to searchable text."""
         lines = [
             f"Schema: {schema.get('name', 'unknown')}",
+        ]
+        if schema.get("description"):
+            lines.append(f"Business Meaning: {schema['description']}")
+        if schema.get("business_context"):
+            lines.append(f"Context: {schema['business_context']}")
+        lines.extend([
             f"Type: {schema.get('type', 'unknown')}",
             f"Repository: {schema.get('repo', 'unknown')}",
             f"Source: {schema.get('source_file', 'unknown')}",
             "Fields:",
-        ]
+        ])
         for field in schema.get("fields", []):
             constraints = ", ".join(field.get("constraints", []))
-            lines.append(f"  - {field.get('name', '?')}: {field.get('type', '?')} ({constraints})")
-        
+            desc = f" - {field['description']}" if field.get("description") else ""
+            lines.append(f"  - {field.get('name', '?')}: {field.get('type', '?')} ({constraints}){desc}")
+
         for rel in schema.get("relationships", []):
             lines.append(f"Relationship: {rel.get('type', '?')} to {rel.get('target', '?')}")
-        
+
         return "\n".join(lines)
     
     def _service_to_text(self, service: dict) -> str:

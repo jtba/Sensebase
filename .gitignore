@@ -25,6 +25,15 @@ wheels/
 venv/
 ENV/
 
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting & type checking
+.ruff_cache/
+.mypy_cache/
+
 # IDE
 .idea/
 .vscode/
@@ -35,11 +44,43 @@ ENV/
 repos/
 output/
 config/gitlab.yaml
+config/github.yaml
+config/config.yaml
 
 # Embeddings/vectors
 *.faiss
 *.pkl
 *.npy
+chroma/
+
+# Hugging Face / model cache
+.cache/
 
 # Logs
 *.log
+logs/
+
+# PID file
+.sensebase.pid
+
+# Claude Code
+CLAUDE.md
+
+# GitHub config
+.github/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Python misc
+.python-version
+pip-log.txt
+
+# Secrets and env files
+.env
+.env.*
+*.pem
+*.key

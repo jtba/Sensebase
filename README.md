@@ -1,4 +1,4 @@
-# ContextPedia
+# SenseBase
 
 A knowledge extraction system that crawls GitLab repositories to build a unified source of truth about business logic, data schemas, dependencies, and data flow — designed for AI agents, chat interfaces, and human search.
 
@@ -14,7 +14,7 @@ Transform scattered codebases into structured, searchable knowledge that answers
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                         ContextPedia                             │
+│                         SenseBase                             │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌─────────┐    ┌────────────┐    ┌─────────┐    ┌───────────┐  │
@@ -31,7 +31,7 @@ Transform scattered codebases into structured, searchable knowledge that answers
 ## 📁 Structure
 
 ```
-contextpedia/
+sensebase/
 ├── src/
 │   ├── crawler/        # GitLab API interaction & repo cloning
 │   ├── analyzers/      # Language-specific code analysis
@@ -58,17 +58,20 @@ cp config/gitlab.example.yaml config/gitlab.yaml
 pip install -e ".[full]"
 
 # 3. Run full pipeline (pattern-based, fast & free)
-contextpedia --full
+sensebase --full
 
 # OR: Run with LLM extraction (better quality, requires ANTHROPIC_API_KEY)
 export ANTHROPIC_API_KEY="sk-ant-..."
-contextpedia --full --llm
+sensebase --full --llm
 
 # 4. Index for semantic search
-cpedia-semantic --index ./output/vectors/chunks.json
+sb-semantic --index ./output/vectors/chunks.json
 
 # 5. Start the API server
-cpedia-api --port 8000
+./ctl.sh start
+
+# Or run in foreground:
+sb-api --port 8000
 ```
 
 ## 🧠 Extraction Modes
@@ -76,18 +79,24 @@ cpedia-api --port 8000
 ### Pattern-Based (Default)
 Fast, free, deterministic. Uses regex/AST parsing per language.
 ```bash
-contextpedia --analyze
+sensebase --analyze
 ```
 
-### LLM-Based (Claude)
-Better quality, understands business context, language-agnostic. Requires API key.
+### LLM-Based
+Better quality, understands business context, language-agnostic. Supports **Anthropic**, **OpenAI**, and **AWS Bedrock** providers.
+
 ```bash
-contextpedia --analyze --llm
-contextpedia --analyze --llm --llm-model claude-opus-4-20250514  # Best quality
+# Configure via web UI at /app/#/settings, or via env vars:
+export ANTHROPIC_API_KEY="sk-ant-..."   # Anthropic
+export OPENAI_API_KEY="sk-..."          # OpenAI
+export AWS_ACCESS_KEY_ID="AKIA..."      # AWS Bedrock
+
+sensebase --analyze --llm
+sensebase --analyze --llm --llm-model claude-opus-4-6-20250918  # Best quality
 ```
 
-| Aspect | Pattern-Based | LLM (Claude) |
-|--------|---------------|--------------|
+| Aspect | Pattern-Based | LLM |
+|--------|---------------|-----|
 | Speed | ⚡ Fast | 🐢 Slower |
 | Cost | Free | ~$0.01-0.10/file |
 | Quality | Good for structure | Excellent for meaning |
@@ -101,24 +110,24 @@ contextpedia --analyze --llm --llm-model claude-opus-4-20250514  # Best quality
 
 ### Keyword Search (CLI)
 ```bash
-cpedia-search "user account"
-cpedia-search --schema User
-cpedia-search --api /users
-cpedia-search --service PaymentService
+sb-search "user account"
+sb-search --schema User
+sb-search --api /users
+sb-search --service PaymentService
 ```
 
 ### Semantic Search (CLI)
 ```bash
 # Natural language queries
-cpedia-semantic "how do we handle user authentication"
-cpedia-semantic "payment processing flow" --type service
-cpedia-semantic --ask "what entities relate to orders"
+sb-semantic "how do we handle user authentication"
+sb-semantic "payment processing flow" --type service
+sb-semantic --ask "what entities relate to orders"
 ```
 
 ### REST API
 ```bash
 # Start server
-cpedia-api --port 8000
+sb-api --port 8000
 
 # Endpoints available at http://localhost:8000/docs
 ```
@@ -143,6 +152,11 @@ cpedia-api --port 8000
 | GET | `/dependencies/{name}/usage` | Find dependency usage |
 | POST | `/semantic/index` | Reindex embeddings |
 | GET | `/semantic/stats` | Embedding index stats |
+| GET | `/config/llm` | Get LLM provider settings |
+| PUT | `/config/llm` | Update LLM provider settings |
+| GET | `/config/sources` | Get configured repository sources |
+| POST | `/config/sources` | Add/update a repository source |
+| DELETE | `/config/sources/{type}` | Remove a repository source |
 
 ### Example API Usage
 
@@ -162,12 +176,10 @@ curl "http://localhost:8000/ask?q=what+is+the+order+lifecycle"
 
 ## ⚙️ Configuration
 
-See `config/gitlab.example.yaml` for GitLab settings.
+Configuration can be managed via the **web UI** at `/app/#/settings` and `/app/#/sources`, or by editing `config/config.yaml` directly.
 
-## 🔒 Privacy
-
-This repository is **private**. Do not commit to public repos.
-Contains references to internal business logic and infrastructure.
+- **Repository sources**: GitHub, GitLab, or local directories — see templates in `config/`
+- **LLM provider**: Anthropic, OpenAI, or AWS Bedrock — configure provider, API key, and model via the Settings page or the `llm` section in config YAML
 
 ## 📊 Output Formats
 
