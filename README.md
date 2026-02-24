@@ -2,6 +2,8 @@
 
 A knowledge extraction system that crawls GitLab repositories to build a unified source of truth about business logic, data schemas, dependencies, and data flow — designed for AI agents, chat interfaces, and human search.
 
+**[View Documentation](https://jtba.github.io/Sensebase/)**
+
 ## 🎯 Purpose
 
 Transform scattered codebases into structured, searchable knowledge that answers:
