@@ -118,6 +118,21 @@ export const api = {
 
   relationships: () => fetchJSON(`${BASE}/relationships`),
 
+  linkTypes: (params = {}) =>
+    fetchJSON(`${BASE}/link-types?${new URLSearchParams(params)}`),
+
+  interfaces: (params = {}) =>
+    fetchJSON(`${BASE}/interfaces?${new URLSearchParams(params)}`),
+
+  graphImpact: (entity, depth = 3) =>
+    fetchJSON(`${BASE}/graph/impact?entity=${encodeURIComponent(entity)}&depth=${depth}`),
+
+  graphNeighbors: (entity, direction = 'both') =>
+    fetchJSON(`${BASE}/graph/neighbors?entity=${encodeURIComponent(entity)}&direction=${direction}`),
+
+  graphPaths: (source, target, maxDepth = 4) =>
+    fetchJSON(`${BASE}/graph/paths?source=${encodeURIComponent(source)}&target=${encodeURIComponent(target)}&max_depth=${maxDepth}`),
+
   semanticGlossary: () => fetchJSON(`${BASE}/semantic/glossary`),
   queryRecipes: (params = {}) => fetchJSON(`${BASE}/semantic/recipes?${new URLSearchParams(params)}`),
   repoSemantic: (name) => fetchJSON(`${BASE}/repos/${encodeURIComponent(name)}/semantic`),

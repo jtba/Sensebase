@@ -10,6 +10,7 @@ from ..analyzers.ontology import (
     InterfaceProperty,
     InterfaceType,
     LinkTypeInfo,
+    RelationshipRef,
     make_entity_id,
 )
 from .graph import GraphEdge, GraphNode, OntologyGraph
@@ -72,6 +73,9 @@ class KnowledgeBase:
         for schema in result.schemas:
             source_id = schema.entity_id
             for rel in schema.relationships:
+                # Normalize dict -> RelationshipRef (analyzers may return dicts)
+                if isinstance(rel, dict):
+                    rel = RelationshipRef.from_dict(rel)
                 # Promote to first-class link type
                 link = LinkTypeInfo.from_relationship_ref(
                     rel, schema.name, schema.source_file,

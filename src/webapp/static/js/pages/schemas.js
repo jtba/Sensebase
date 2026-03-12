@@ -42,6 +42,11 @@ export default {
             <div class="flex items-start gap-3 flex-wrap">
               <h1 class="text-2xl font-bold text-gray-100">{{ detailData.name }}</h1>
               <span class="badge badge-schema">{{ detailData.type || 'schema' }}</span>
+              <span v-if="detailData.status && detailData.status !== 'active'" class="badge text-xs" :class="{
+                'bg-red-500/10 text-red-400 border border-red-500/20': detailData.status === 'deprecated',
+                'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20': detailData.status === 'experimental',
+                'bg-gray-500/10 text-gray-400 border border-gray-500/20': detailData.status === 'draft',
+              }">{{ detailData.status }}</span>
             </div>
             <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
               <span v-if="detailData.repo" class="flex items-center gap-1">
@@ -57,6 +62,17 @@ export default {
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
               View in Graph
             </button>
+          </div>
+
+          <!-- Implements -->
+          <div v-if="detailData.implements && detailData.implements.length > 0" class="flex flex-wrap gap-2 mb-6">
+            <span class="text-xs text-gray-500 self-center">Implements:</span>
+            <router-link
+              v-for="iface in detailData.implements"
+              :key="iface"
+              :to="'/interfaces'"
+              class="px-2 py-1 bg-accent-purple/10 text-accent-purple rounded text-xs border border-accent-purple/20 hover:bg-accent-purple/20 transition-colors"
+            >{{ iface }}</router-link>
           </div>
 
           <!-- Business Meaning -->
@@ -250,7 +266,14 @@ export default {
           >
             <div class="flex items-start justify-between gap-2 mb-2">
               <h3 class="text-sm font-semibold text-gray-200 truncate">{{ schema.name }}</h3>
-              <span class="badge badge-schema flex-shrink-0">{{ schema.type || 'schema' }}</span>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <span v-if="schema.status && schema.status !== 'active'" class="badge text-xs" :class="{
+                  'bg-red-500/10 text-red-400 border border-red-500/20': schema.status === 'deprecated',
+                  'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20': schema.status === 'experimental',
+                  'bg-gray-500/10 text-gray-400 border border-gray-500/20': schema.status === 'draft',
+                }">{{ schema.status }}</span>
+                <span class="badge badge-schema">{{ schema.type || 'schema' }}</span>
+              </div>
             </div>
             <div v-if="schema.repo" class="text-xs text-gray-500 truncate">{{ schema.repo }}</div>
             <p v-if="schema.description" class="text-xs text-gray-400 mt-1 mb-2 line-clamp-2" style="-webkit-line-clamp:2; display:-webkit-box; -webkit-box-orient:vertical; overflow:hidden;">{{ schema.description }}</p>

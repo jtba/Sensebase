@@ -134,6 +134,13 @@ export default {
                 <!-- Path -->
                 <span class="flex-1 font-mono text-sm text-gray-300 truncate" v-html="highlightParams(endpoint.path)"></span>
 
+                <!-- Status -->
+                <span v-if="endpoint.status && endpoint.status !== 'active'" class="text-xs px-1.5 py-0.5 rounded" :class="{
+                  'bg-red-500/10 text-red-400': endpoint.status === 'deprecated',
+                  'bg-yellow-500/10 text-yellow-400': endpoint.status === 'experimental',
+                  'bg-gray-500/10 text-gray-400': endpoint.status === 'draft',
+                }">{{ endpoint.status }}</span>
+
                 <!-- Handler -->
                 <span v-if="endpoint.handler" class="text-xs text-gray-500 hidden lg:inline truncate max-w-[200px]">{{ endpoint.handler }}</span>
 

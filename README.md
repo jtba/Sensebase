@@ -1,33 +1,104 @@
 # SenseBase
 
-A knowledge extraction system that crawls GitLab repositories to build a unified source of truth about business logic, data schemas, dependencies, and data flow — designed for AI agents, chat interfaces, and human search.
+A knowledge extraction system that crawls GitHub, GitLab, or local repositories to build a graph-backed ontology of business logic, data schemas, dependencies, and data flow — designed for AI agents, chat interfaces, and human search.
 
 **[View Documentation](https://jtba.github.io/Sensebase/)**
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard" width="100%">
+  <br><em>Dashboard -- at-a-glance stats, system health, API breakdown, and repository list</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/knowledge-graph.png" alt="Knowledge Graph" width="100%">
+  <br><em>Knowledge Graph -- interactive D3 force-directed visualization of schemas, services, APIs, and dependencies</em>
+</p>
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+
+<p align="center">
+  <img src="docs/screenshots/schema-explorer.png" alt="Schema Explorer" width="100%">
+  <br><em>Schema Explorer -- browse and filter all discovered data models across repositories</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/api-explorer.png" alt="API Explorer" width="100%">
+  <br><em>API Explorer -- view all endpoints organized by method, path, and repository</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/relationships.png" alt="Service Relationships" width="100%">
+  <br><em>Service Relationships -- cross-service dependencies, data routing, and service clusters</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/dependencies.png" alt="Dependency Map" width="100%">
+  <br><em>Dependency Map -- track external libraries and internal dependencies across all repos</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/settings.png" alt="System Configuration" width="100%">
+  <br><em>System Configuration -- health status, knowledge base stats, and LLM provider setup</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/pipeline.png" alt="Pipeline" width="100%">
+  <br><em>Pipeline -- trigger crawl runs, monitor progress, and configure extraction options</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/service-catalog.png" alt="Service Catalog" width="100%">
+  <br><em>Service Catalog -- all discovered services with descriptions and dependency counts</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/sources.png" alt="Sources" width="100%">
+  <br><em>Sources -- configure GitHub, GitLab, or local repository sources</em>
+</p>
+
+</details>
+
 ## 🎯 Purpose
 
-Transform scattered codebases into structured, searchable knowledge that answers:
+Transform scattered codebases into a graph-backed, searchable knowledge base that answers:
 - "What does this data model look like?"
 - "How does data flow through the system?"
 - "What are the business rules for X?"
 - "What depends on this service?"
+- "What breaks if I change this schema?"
+- "Which entities share the Auditable interface across repos?"
+
+## 🆕 v0.2.0 — Ontology Graph Store
+
+This release introduces an ontology-grade knowledge store inspired by Palantir Foundry best practices:
+
+- **Graph-Queryable Store** — The knowledge base is backed by a full graph with bidirectional adjacency lists, BFS traversal, path finding, and type/name/repo indexes.
+- **First-Class Link Types** — Relationships are promoted to first-class entities with cardinality (one-to-one, one-to-many, many-to-many), properties, and automatic bidirectional inverse navigation.
+- **Interface Polymorphism** — Schemas sharing common field signatures across repositories are automatically grouped under inferred interfaces (Auditable, Timestamped, SoftDeletable, etc.).
+- **Entity Lifecycle Status** — Every entity carries a status — active, deprecated, experimental, or draft — so consumers know what's safe to depend on.
+- **Impact Analysis** — Ask "what breaks if I change User?" and get a transitive dependency graph via BFS traversal.
+- **Backward Compatible** — Reads existing v1 knowledge base files and rebuilds the graph automatically.
 
 ## 🏗️ Architecture
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│                         SenseBase                             │
-├──────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌─────────┐    ┌────────────┐    ┌─────────┐    ┌───────────┐  │
-│  │ GitLab  │───▶│ Analyzers  │───▶│ Knowledge│───▶│  Query    │  │
-│  │ Crawler │    │ & Extract  │    │  Store   │    │  Layer    │  │
-│  └─────────┘    └────────────┘    └─────────┘    └───────────┘  │
-│                                                                  │
-│  Languages: Java, Python, Go, JS/HTML/CSS                        │
-│  Output: JSON | Markdown | Vectors | REST API                    │
-│                                                                  │
-└──────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────┐
+│                            SenseBase v0.2.0                           │
+├───────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  ┌──────────┐   ┌────────────┐   ┌──────────┐   ┌─────────────────┐  │
+│  │ GitHub / │──▶│ Analyzers  │──▶│ Ontology │──▶│  Query Layer    │  │
+│  │ GitLab / │   │ & LLM      │   │  Graph   │   │  + REST API     │  │
+│  │ Local    │   │ Extractors │   │  Store   │   │  + Web Dashboard│  │
+│  └──────────┘   └────────────┘   └──────────┘   └─────────────────┘  │
+│                                                                       │
+│  Ontology: Schemas, APIs, Services, Links, Interfaces, Lifecycle      │
+│  Output: JSON | Markdown | Vectors | REST API                         │
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘
 ```
 
 ## 📁 Structure
@@ -35,12 +106,19 @@ Transform scattered codebases into structured, searchable knowledge that answers
 ```
 sensebase/
 ├── src/
-│   ├── crawler/        # GitLab API interaction & repo cloning
-│   ├── analyzers/      # Language-specific code analysis
-│   ├── extractors/     # Schema, dependency, business logic extraction
-│   ├── store/          # Knowledge storage & indexing
+│   ├── crawler/        # GitHub/GitLab/local repo discovery & cloning
+│   ├── analyzers/
+│   │   ├── ontology.py # Central ontology: enums, types, link types, interfaces
+│   │   ├── base.py     # Core data models (SchemaInfo, APIInfo, etc.)
+│   │   ├── registry.py # Analyzer registry & dispatch
+│   │   └── ...         # Language-specific analyzers (Python, Java, Go, JS)
+│   ├── extractors/     # LLM-powered enrichment & relationship extraction
+│   ├── store/
+│   │   ├── graph.py    # Graph-queryable ontology store (nodes, edges, BFS)
+│   │   ├── knowledge_base.py  # KnowledgeBase with graph backend
+│   │   └── output.py   # JSON, Markdown, vector output generation
 │   ├── query/          # Search (keyword + semantic)
-│   └── api/            # REST API server
+│   └── api/            # REST API server + web dashboard
 ├── output/
 │   ├── json/           # Structured data for AI agents
 │   ├── markdown/       # Human-readable documentation
@@ -52,9 +130,12 @@ sensebase/
 ## 🚀 Quick Start
 
 ```bash
-# 1. Configure GitLab connection
-cp config/gitlab.example.yaml config/gitlab.yaml
-# Edit with your GitLab URL and token
+# 1. Configure your repo source (GitHub, GitLab, or local)
+cp config/github.example.yaml config/config.yaml   # GitHub
+cp config/gitlab.example.yaml config/config.yaml    # GitLab
+cp config/local.example.yaml config/config.yaml     # Local directories
+# Or run the interactive setup:
+./setup.sh
 
 # 2. Install with all features
 pip install -e ".[full]"
@@ -156,6 +237,10 @@ sb-api --port 8000
 | GET | `/semantic/stats` | Embedding index stats |
 | GET | `/config/llm` | Get LLM provider settings |
 | PUT | `/config/llm` | Update LLM provider settings |
+| GET | `/link-types` | List link types with cardinality |
+| GET | `/interfaces` | List inferred interfaces |
+| GET | `/graph/impact` | Impact analysis (transitive deps) |
+| GET | `/graph/paths` | Find paths between entities |
 | GET | `/config/sources` | Get configured repository sources |
 | POST | `/config/sources` | Add/update a repository source |
 | DELETE | `/config/sources/{type}` | Remove a repository source |
@@ -174,6 +259,13 @@ curl "http://localhost:8000/schemas/User"
 
 # RAG context for AI
 curl "http://localhost:8000/ask?q=what+is+the+order+lifecycle"
+
+# Impact analysis: what depends on User?
+curl "http://localhost:8000/graph/impact?entity=User&depth=3"
+
+# Browse link types and interfaces
+curl "http://localhost:8000/link-types"
+curl "http://localhost:8000/interfaces"
 ```
 
 ## ⚙️ Configuration

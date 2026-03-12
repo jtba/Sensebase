@@ -43,6 +43,7 @@ htmlcov/
 # Project specific
 repos/
 output/
+service_relationships.json
 config/gitlab.yaml
 config/github.yaml
 config/config.yaml
@@ -65,6 +66,7 @@ logs/
 
 # Claude Code
 CLAUDE.md
+.claude/
 
 # GitHub config
 .github/

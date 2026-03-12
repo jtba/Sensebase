@@ -17,6 +17,8 @@ import DataFlows from './pages/dataflows.js';
 import Crawl from './pages/crawl.js';
 import Contexts from './pages/contexts.js';
 import Relationships from './pages/relationships.js';
+import LinkTypes from './pages/linktypes.js';
+import Interfaces from './pages/interfaces.js';
 import Settings from './pages/settings.js';
 import Sources from './pages/sources.js';
 
@@ -30,11 +32,13 @@ const routes = [
   { path: '/services', component: Services, meta: { title: 'Service Catalog' } },
   { path: '/services/:name', component: Services, meta: { title: 'Service Detail' } },
   { path: '/apis', component: Apis, meta: { title: 'API Explorer' } },
-  { path: '/dependencies', component: Dependencies, meta: { title: 'Dependencies' } },
+  { path: '/dependencies', component: Dependencies, meta: { title: 'Dependency Explorer' } },
   { path: '/data-flows', component: DataFlows, meta: { title: 'Data Flows' } },
   { path: '/contexts', component: Contexts, meta: { title: 'Service Contexts' } },
   { path: '/contexts/:name', component: Contexts, meta: { title: 'Context Detail' } },
   { path: '/relationships', component: Relationships, meta: { title: 'Relationships' } },
+  { path: '/link-types', component: LinkTypes, meta: { title: 'Link Types' } },
+  { path: '/interfaces', component: Interfaces, meta: { title: 'Interfaces' } },
   { path: '/crawl', component: Crawl, meta: { title: 'Pipeline' } },
   { path: '/settings', component: Settings, meta: { title: 'System Configuration' } },
   { path: '/sources', component: Sources, meta: { title: 'Sources' } },
@@ -135,7 +139,7 @@ const App = {
             <span>{{ darkMode ? 'Light Mode' : 'Dark Mode' }}</span>
           </button>
           <div class="px-3 text-xs text-gray-600">
-            SenseBase v1.0
+            SenseBase v0.2.0
           </div>
         </div>
       </aside>
@@ -260,7 +264,9 @@ const App = {
         items: [
           { path: '/schemas', label: 'Schemas', icon: icons.database },
           { path: '/services', label: 'Service Catalog', icon: icons.cube },
-          { path: '/dependencies', label: 'Dependency Map', icon: icons.package },
+          { path: '/dependencies', label: 'Dependency Explorer', icon: icons.package },
+          { path: '/link-types', label: 'Link Types', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>` },
+          { path: '/interfaces', label: 'Interfaces', icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg>` },
           { path: '/data-flows', label: 'Data Flows', icon: icons.flow },
         ],
       },

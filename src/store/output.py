@@ -165,7 +165,14 @@ Generated: {summary['generated_at']}
             
             content += f"- **Type:** {schema.get('type', 'unknown')}\n"
             content += f"- **Source:** `{schema.get('source_file', 'unknown')}`\n"
-            content += f"- **Repository:** {schema.get('repo', 'unknown')}\n\n"
+            content += f"- **Repository:** {schema.get('repo', 'unknown')}\n"
+            status = schema.get("status", "active")
+            if status and status != "active":
+                content += f"- **Status:** `{status}`\n"
+            implements = schema.get("implements", [])
+            if implements:
+                content += f"- **Implements:** {', '.join(implements)}\n"
+            content += "\n"
 
             if schema.get("description"):
                 content += f"### Business Meaning\n\n{schema['description']}\n\n"
@@ -567,12 +574,18 @@ Generated: {summary['generated_at']}
             lines.append(f"Business Meaning: {schema['description']}")
         if schema.get("business_context"):
             lines.append(f"Context: {schema['business_context']}")
+        status = schema.get("status", "active")
+        implements = schema.get("implements", [])
         lines.extend([
             f"Type: {schema.get('type', 'unknown')}",
             f"Repository: {schema.get('repo', 'unknown')}",
             f"Source: {schema.get('source_file', 'unknown')}",
-            "Fields:",
         ])
+        if status and status != "active":
+            lines.append(f"Status: {status}")
+        if implements:
+            lines.append(f"Implements: {', '.join(implements)}")
+        lines.append("Fields:")
         for field in schema.get("fields", []):
             constraints = ", ".join(field.get("constraints", []))
             desc = f" - {field['description']}" if field.get("description") else ""

@@ -208,7 +208,14 @@ export default {
           >
             <div class="flex items-start justify-between gap-2 mb-2">
               <h3 class="text-sm font-semibold text-gray-200 truncate">{{ service.name }}</h3>
-              <span class="badge badge-service flex-shrink-0">{{ service.type || 'service' }}</span>
+              <div class="flex items-center gap-1.5 flex-shrink-0">
+                <span v-if="service.status && service.status !== 'active'" class="badge text-xs" :class="{
+                  'bg-red-500/10 text-red-400 border border-red-500/20': service.status === 'deprecated',
+                  'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20': service.status === 'experimental',
+                  'bg-gray-500/10 text-gray-400 border border-gray-500/20': service.status === 'draft',
+                }">{{ service.status }}</span>
+                <span class="badge badge-service">{{ service.type || 'service' }}</span>
+              </div>
             </div>
             <div v-if="service.repo" class="text-xs text-gray-500 mb-2 truncate">{{ service.repo }}</div>
             <p v-if="service.description" class="text-xs text-gray-500 mb-3 line-clamp-2">{{ service.description }}</p>
