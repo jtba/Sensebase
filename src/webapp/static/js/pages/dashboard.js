@@ -246,6 +246,18 @@ export default {
         textColor: 'text-accent-amber',
         icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>'
       },
+      {
+        key: 'link_types', label: 'Link Types', borderClass: 'stat-card-teal',
+        iconBg: 'bg-teal-500/10',
+        textColor: 'text-teal-400',
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>'
+      },
+      {
+        key: 'interfaces', label: 'Interfaces', borderClass: 'stat-card-purple',
+        iconBg: 'bg-purple-500/10',
+        textColor: 'text-purple-400',
+        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h4a1 1 0 011 1v6a1 1 0 01-1 1h-4a1 1 0 01-1-1v-6z"/></svg>'
+      },
     ];
 
     function animateCount(key, target) {

@@ -95,6 +95,8 @@ class SchemaDetail(BaseModel):
     description: str | None = None
     business_context: str | None = None
     query_recipes: list[dict] = Field(default_factory=list)
+    status: str = "active"
+    implements: list[str] = Field(default_factory=list)
 
 
 class ServiceDetail(BaseModel):
@@ -106,6 +108,7 @@ class ServiceDetail(BaseModel):
     description: str | None = None
     methods: list[dict] = Field(default_factory=list)
     dependencies: list[str] = Field(default_factory=list)
+    status: str = "active"
 
 
 class APIEndpoint(BaseModel):
@@ -117,6 +120,7 @@ class APIEndpoint(BaseModel):
     handler: str | None = None
     description: str | None = None
     params: list[dict] = Field(default_factory=list)
+    status: str = "active"
 
 
 class StatsResponse(BaseModel):
@@ -132,18 +136,23 @@ class StatsResponse(BaseModel):
     total_semantic_layers: int = 0
     total_query_recipes: int = 0
     total_glossary_terms: int = 0
+    total_link_types: int = 0
+    total_interfaces: int = 0
     # Short aliases used by the webapp dashboard
     repos: int = 0
     schemas: int = 0
     apis: int = 0
     services: int = 0
     dependencies: int = 0
+    link_types: int = 0
+    interfaces: int = 0
 
 
 # Global state (initialized on startup)
 _search_engine: SearchEngine | None = None
 _semantic_search = None
 _kb_data: dict | None = None
+_knowledge_base: KnowledgeBase | None = None
 
 
 def create_app(
@@ -157,7 +166,7 @@ def create_app(
     app = FastAPI(
         title="SenseBase API",
         description="Knowledge extraction and search API for GitLab repositories",
-        version="0.1.0",
+        version="0.2.0",
         docs_url="/docs",
         redoc_url="/redoc",
     )
@@ -174,11 +183,19 @@ def create_app(
     @app.on_event("startup")
     async def startup():
         """Initialize search engines on startup."""
-        global _search_engine, _semantic_search, _kb_data
-        
+        global _search_engine, _semantic_search, _kb_data, _knowledge_base
+
         # Load keyword search
         _search_engine = SearchEngine(kb_path)
         _kb_data = _search_engine.data
+
+        # Load graph-backed knowledge base for ontology v2 queries
+        try:
+            _knowledge_base = KnowledgeBase()
+            _knowledge_base.load(kb_path)
+        except Exception as e:
+            logger.warning("Graph knowledge base unavailable: %s", e)
+            _knowledge_base = None
         
         # Load semantic search if enabled
         if enable_semantic:
@@ -223,6 +240,8 @@ def create_app(
             apis=summary.get("total_apis", 0),
             services=summary.get("total_services", 0),
             dependencies=summary.get("total_dependencies", 0),
+            link_types=summary.get("total_link_types", len(_kb_data.get("link_types", []))),
+            interfaces=summary.get("total_interfaces", len(_kb_data.get("interfaces", []))),
         )
     
     # Keyword Search
@@ -938,6 +957,120 @@ def create_app(
             raise HTTPException(status_code=503, detail="Knowledge base not loaded")
 
         return _kb_data.get("relationships", {})
+
+    # ---- Ontology v2 Endpoints (Link Types, Interfaces, Graph Traversal) ----
+
+    @app.get("/link-types")
+    async def list_link_types(
+        source: str | None = None,
+        target: str | None = None,
+        limit: int = 100,
+    ):
+        """List all link types with optional source/target filters."""
+        if not _kb_data:
+            raise HTTPException(status_code=503, detail="Knowledge base not loaded")
+
+        links = _kb_data.get("link_types", [])
+
+        if source:
+            links = [lt for lt in links if source.lower() in lt.get("source_type", "").lower()]
+        if target:
+            links = [lt for lt in links if target.lower() in lt.get("target_type", "").lower()]
+
+        return {"link_types": links[:limit], "count": len(links)}
+
+    @app.get("/interfaces")
+    async def list_interfaces(
+        name: str | None = None,
+        limit: int = 100,
+    ):
+        """List all inferred interfaces."""
+        if not _kb_data:
+            raise HTTPException(status_code=503, detail="Knowledge base not loaded")
+
+        ifaces = _kb_data.get("interfaces", [])
+
+        if name:
+            ifaces = [i for i in ifaces if name.lower() in i.get("name", "").lower()]
+
+        return {"interfaces": ifaces[:limit], "count": len(ifaces)}
+
+    @app.get("/graph/impact")
+    async def get_impact_analysis(
+        entity: Annotated[str, Query(description="Entity name to analyze")],
+        depth: int = 3,
+    ):
+        """Impact analysis: what would be affected if this entity changes?"""
+        if not _knowledge_base:
+            raise HTTPException(status_code=503, detail="Graph knowledge base not loaded")
+
+        result = _knowledge_base.get_impact_analysis(entity, max_depth=depth)
+        if result["affected_count"] == 0:
+            nodes = _knowledge_base.graph.find_by_name_substring(entity)
+            if not nodes:
+                raise HTTPException(status_code=404, detail=f"Entity '{entity}' not found")
+            result = _knowledge_base.get_impact_analysis(
+                nodes[0].data.get("name", entity), max_depth=depth,
+            )
+
+        return result
+
+    @app.get("/graph/neighbors")
+    async def get_graph_neighbors(
+        entity: Annotated[str, Query(description="Entity name")],
+        direction: str = "both",
+    ):
+        """Get direct neighbors of an entity in the ontology graph."""
+        if not _knowledge_base:
+            raise HTTPException(status_code=503, detail="Graph knowledge base not loaded")
+
+        nodes = _knowledge_base.graph.find_by_name(entity)
+        if not nodes:
+            nodes = _knowledge_base.graph.find_by_name_substring(entity)
+        if not nodes:
+            raise HTTPException(status_code=404, detail=f"Entity '{entity}' not found")
+
+        node = nodes[0]
+        neighbors = _knowledge_base.graph.neighbors(node.id, direction=direction)
+        return {
+            "entity": node.data.get("name", entity),
+            "entity_id": node.id,
+            "neighbors": [
+                {"id": n.id, "type": n.type, "name": n.data.get("name", n.id), "repo": n.repo}
+                for n in neighbors
+            ],
+            "count": len(neighbors),
+        }
+
+    @app.get("/graph/paths")
+    async def get_graph_paths(
+        source: Annotated[str, Query(description="Source entity name")],
+        target: Annotated[str, Query(description="Target entity name")],
+        max_depth: int = 4,
+    ):
+        """Find paths between two entities in the ontology graph."""
+        if not _knowledge_base:
+            raise HTTPException(status_code=503, detail="Graph knowledge base not loaded")
+
+        src_nodes = (_knowledge_base.graph.find_by_name(source)
+                     or _knowledge_base.graph.find_by_name_substring(source))
+        tgt_nodes = (_knowledge_base.graph.find_by_name(target)
+                     or _knowledge_base.graph.find_by_name_substring(target))
+
+        if not src_nodes:
+            raise HTTPException(status_code=404, detail=f"Source entity '{source}' not found")
+        if not tgt_nodes:
+            raise HTTPException(status_code=404, detail=f"Target entity '{target}' not found")
+
+        paths = _knowledge_base.graph.find_paths(
+            src_nodes[0].id, tgt_nodes[0].id, max_depth=max_depth,
+        )
+        return {
+            "source": source,
+            "target": target,
+            "paths": paths,
+            "count": len(paths),
+        }
 
     # ---- Semantic Business Layer Endpoints ----
 
