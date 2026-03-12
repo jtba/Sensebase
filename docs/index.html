@@ -466,6 +466,70 @@
             font-size: 0.9rem;
         }
 
+        /* Screenshot gallery */
+        .screenshot-gallery {
+            margin-top: 3rem;
+        }
+
+        .screenshot-gallery h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .screenshot-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .screenshot-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .screenshot-tab:hover,
+        .screenshot-tab.active {
+            border-color: var(--accent);
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .screenshot-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .screenshot-container img {
+            width: 100%;
+            display: block;
+            transition: opacity 0.4s;
+        }
+
+        .screenshot-container img.hidden {
+            display: none;
+        }
+
+        .screenshot-caption {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
         /* Dashboard showcase */
         .dashboard-grid {
             display: grid;
@@ -951,6 +1015,33 @@
                     <p>Manage repository sources and LLM provider settings (Anthropic, OpenAI, AWS Bedrock) from the web interface</p>
                 </div>
             </div>
+
+            <div class="screenshot-gallery fade-in">
+                <h3>See It In Action</h3>
+                <div class="screenshot-tabs">
+                    <button class="screenshot-tab active" data-target="ss-dashboard">Dashboard</button>
+                    <button class="screenshot-tab" data-target="ss-graph">Knowledge Graph</button>
+                    <button class="screenshot-tab" data-target="ss-schemas">Schema Explorer</button>
+                    <button class="screenshot-tab" data-target="ss-apis">API Explorer</button>
+                    <button class="screenshot-tab" data-target="ss-relationships">Relationships</button>
+                    <button class="screenshot-tab" data-target="ss-deps">Dependencies</button>
+                    <button class="screenshot-tab" data-target="ss-services">Service Catalog</button>
+                    <button class="screenshot-tab" data-target="ss-settings">Configuration</button>
+                    <button class="screenshot-tab" data-target="ss-pipeline">Pipeline</button>
+                </div>
+                <div class="screenshot-container">
+                    <img id="ss-dashboard" src="screenshots/dashboard.png" alt="Dashboard view">
+                    <img id="ss-graph" src="screenshots/knowledge-graph.png" alt="Knowledge Graph" class="hidden">
+                    <img id="ss-schemas" src="screenshots/schema-explorer.png" alt="Schema Explorer" class="hidden">
+                    <img id="ss-apis" src="screenshots/api-explorer.png" alt="API Explorer" class="hidden">
+                    <img id="ss-relationships" src="screenshots/relationships.png" alt="Service Relationships" class="hidden">
+                    <img id="ss-deps" src="screenshots/dependencies.png" alt="Dependency Map" class="hidden">
+                    <img id="ss-services" src="screenshots/service-catalog.png" alt="Service Catalog" class="hidden">
+                    <img id="ss-settings" src="screenshots/settings.png" alt="System Configuration" class="hidden">
+                    <img id="ss-pipeline" src="screenshots/pipeline.png" alt="Pipeline Manager" class="hidden">
+                </div>
+                <p class="screenshot-caption" id="ss-caption">Dashboard -- at-a-glance stats, system health, and repository overview</p>
+            </div>
         </section>
 
         <!-- Features -->
@@ -1196,6 +1287,36 @@
                         behavior: 'smooth',
                         block: 'start'
                     });
+                }
+            });
+        });
+
+        // Screenshot gallery tab switching
+        const captions = {
+            'ss-dashboard': 'Dashboard -- at-a-glance stats, system health, and repository overview',
+            'ss-graph': 'Knowledge Graph -- interactive D3 force-directed visualization of all entities',
+            'ss-schemas': 'Schema Explorer -- browse and filter data models across repositories',
+            'ss-apis': 'API Explorer -- all endpoints organized by method, path, and repository',
+            'ss-relationships': 'Service Relationships -- cross-service dependencies and data routing',
+            'ss-deps': 'Dependency Map -- external libraries and internal dependencies across repos',
+            'ss-services': 'Service Catalog -- discovered services with descriptions and dependency counts',
+            'ss-settings': 'System Configuration -- health status, knowledge base stats, and LLM provider',
+            'ss-pipeline': 'Pipeline -- trigger crawl runs and monitor extraction progress',
+        };
+
+        document.querySelectorAll('.screenshot-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.screenshot-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const targetId = tab.dataset.target;
+                document.querySelectorAll('.screenshot-container img').forEach(img => {
+                    img.classList.toggle('hidden', img.id !== targetId);
+                });
+
+                const captionEl = document.getElementById('ss-caption');
+                if (captionEl && captions[targetId]) {
+                    captionEl.textContent = captions[targetId];
                 }
             });
         });

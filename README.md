@@ -4,6 +4,63 @@ A knowledge extraction system that crawls GitHub, GitLab, or local repositories 
 
 **[View Documentation](https://jtba.github.io/Sensebase/)**
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard" width="100%">
+  <br><em>Dashboard -- at-a-glance stats, system health, API breakdown, and repository list</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/knowledge-graph.png" alt="Knowledge Graph" width="100%">
+  <br><em>Knowledge Graph -- interactive D3 force-directed visualization of schemas, services, APIs, and dependencies</em>
+</p>
+
+<details>
+<summary><strong>More screenshots</strong></summary>
+
+<p align="center">
+  <img src="docs/screenshots/schema-explorer.png" alt="Schema Explorer" width="100%">
+  <br><em>Schema Explorer -- browse and filter all discovered data models across repositories</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/api-explorer.png" alt="API Explorer" width="100%">
+  <br><em>API Explorer -- view all endpoints organized by method, path, and repository</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/relationships.png" alt="Service Relationships" width="100%">
+  <br><em>Service Relationships -- cross-service dependencies, data routing, and service clusters</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/dependencies.png" alt="Dependency Map" width="100%">
+  <br><em>Dependency Map -- track external libraries and internal dependencies across all repos</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/settings.png" alt="System Configuration" width="100%">
+  <br><em>System Configuration -- health status, knowledge base stats, and LLM provider setup</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/pipeline.png" alt="Pipeline" width="100%">
+  <br><em>Pipeline -- trigger crawl runs, monitor progress, and configure extraction options</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/service-catalog.png" alt="Service Catalog" width="100%">
+  <br><em>Service Catalog -- all discovered services with descriptions and dependency counts</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/sources.png" alt="Sources" width="100%">
+  <br><em>Sources -- configure GitHub, GitLab, or local repository sources</em>
+</p>
+
+</details>
+
 ## 🎯 Purpose
 
 Transform scattered codebases into a graph-backed, searchable knowledge base that answers:
