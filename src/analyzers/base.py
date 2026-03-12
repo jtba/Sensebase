@@ -1,24 +1,51 @@
-"""Base analyzer interface."""
+"""Base analyzer interface and core data models."""
+
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+
+from .ontology import (
+    BusinessLogicType,
+    DataFlowType,
+    DependencyType,
+    Ecosystem,
+    EntityStatus,
+    HTTPMethod,
+    SchemaType,
+    DataOwnershipEntry,
+    FieldInfo,
+    GlossaryEntry,
+    InterfaceType,
+    LinkTypeInfo,
+    MethodInfo,
+    ParamInfo,
+    QueryRecipe,
+    RelationshipRef,
+    ServiceDependencyEntry,
+)
 
 
 @dataclass
 class SchemaInfo:
     """Extracted schema information."""
     name: str
-    type: str  # "table", "model", "entity", "type", "interface"
+    type: SchemaType
     source_file: str
-    fields: list[dict[str, Any]]  # name, type, constraints, description
-    relationships: list[dict[str, Any]]  # type, target, description
+    fields: list[FieldInfo]
+    relationships: list[RelationshipRef]
     raw_definition: str | None = None
     # Semantic business layer
     description: str | None = None  # Business meaning of this entity
     business_context: str | None = None  # When to query, how it fits in domain
-    query_recipes: list[dict[str, Any]] = field(default_factory=list)  # How to get this data
+    query_recipes: list[QueryRecipe] = field(default_factory=list)
+    # Identity (set by KnowledgeBase.add_result)
+    entity_id: str = ""
+    # Lifecycle status
+    status: EntityStatus = EntityStatus.ACTIVE
+    # Interfaces this schema implements
+    implements: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -26,37 +53,46 @@ class DependencyInfo:
     """Extracted dependency information."""
     name: str
     version: str | None
-    type: str  # "runtime", "dev", "optional", "peer"
+    type: DependencyType
     source_file: str
-    ecosystem: str  # "maven", "pip", "npm", "go"
+    ecosystem: Ecosystem
+    # Identity (set by KnowledgeBase.add_result)
+    entity_id: str = ""
+    status: EntityStatus = EntityStatus.ACTIVE
 
 
 @dataclass
 class BusinessLogicInfo:
     """Extracted business logic information."""
     name: str
-    type: str  # "service", "handler", "rule", "workflow", "validator"
+    type: BusinessLogicType
     source_file: str
     description: str | None
-    methods: list[dict[str, Any]]  # name, params, returns, docstring
+    methods: list[MethodInfo]
     dependencies: list[str]  # other services/components used
     data_accessed: list[str]  # schemas/entities this touches
+    # Identity (set by KnowledgeBase.add_result)
+    entity_id: str = ""
+    status: EntityStatus = EntityStatus.ACTIVE
 
 
 @dataclass
 class APIInfo:
     """Extracted API endpoint information."""
     path: str
-    method: str
+    method: HTTPMethod
     source_file: str
     handler: str
-    params: list[dict[str, Any]]
-    request_body: dict[str, Any] | None
-    response: dict[str, Any] | None
+    params: list[ParamInfo]
+    request_body: dict | None
+    response: dict | None
     description: str | None
     # Semantic business layer
     business_description: str | None = None  # When/why an agent would call this
-    example_questions: list[str] = field(default_factory=list)  # Questions this answers
+    example_questions: list[str] = field(default_factory=list)
+    # Identity (set by KnowledgeBase.add_result)
+    entity_id: str = ""
+    status: EntityStatus = EntityStatus.ACTIVE
 
 
 @dataclass
@@ -64,7 +100,7 @@ class DataFlowInfo:
     """Data flow between components."""
     source: str  # source component/entity
     target: str  # target component/entity
-    type: str  # "read", "write", "transform", "publish", "subscribe"
+    type: DataFlowType
     description: str | None
     source_file: str
 
@@ -78,8 +114,8 @@ class RepoContext:
     purpose: str
     domain: str
     when_to_use: list[str] = field(default_factory=list)
-    data_ownership: list[dict[str, Any]] = field(default_factory=list)
-    service_dependencies: list[dict[str, Any]] = field(default_factory=list)
+    data_ownership: list[DataOwnershipEntry] = field(default_factory=list)
+    service_dependencies: list[ServiceDependencyEntry] = field(default_factory=list)
     generated_at: str = ""
     model: str = ""
     file_count: int = 0
@@ -89,10 +125,10 @@ class RepoContext:
 class SemanticLayer:
     """Business semantic layer for a repository."""
     repo_name: str
-    business_glossary: list[dict[str, Any]] = field(default_factory=list)
+    business_glossary: list[GlossaryEntry] = field(default_factory=list)
     entity_descriptions: dict[str, str] = field(default_factory=dict)
     field_descriptions: dict[str, dict[str, str]] = field(default_factory=dict)
-    query_recipes: list[dict[str, Any]] = field(default_factory=list)
+    query_recipes: list[QueryRecipe] = field(default_factory=list)
     generated_at: str = ""
     model: str = ""
 
@@ -108,6 +144,8 @@ class AnalysisResult:
     business_logic: list[BusinessLogicInfo] = field(default_factory=list)
     apis: list[APIInfo] = field(default_factory=list)
     data_flows: list[DataFlowInfo] = field(default_factory=list)
+    link_types: list[LinkTypeInfo] = field(default_factory=list)
+    interfaces: list[InterfaceType] = field(default_factory=list)
 
     # Holistic LLM-generated context
     context: RepoContext | None = None
@@ -128,6 +166,8 @@ class AnalysisResult:
         self.business_logic.extend(other.business_logic)
         self.apis.extend(other.apis)
         self.data_flows.extend(other.data_flows)
+        self.link_types.extend(other.link_types)
+        self.interfaces.extend(other.interfaces)
         self.analyzed_files.extend(other.analyzed_files)
         self.errors.extend(other.errors)
         if other.context and not self.context:
@@ -138,40 +178,40 @@ class AnalysisResult:
 
 class Analyzer(ABC):
     """Base class for code analyzers."""
-    
+
     # File extensions this analyzer handles
     extensions: list[str] = []
-    
+
     # Language name
     language: str = "unknown"
-    
+
     @abstractmethod
     def analyze_file(self, file_path: Path, content: str) -> AnalysisResult:
         """Analyze a single file and extract knowledge."""
         pass
-    
+
     def can_handle(self, file_path: Path) -> bool:
         """Check if this analyzer can handle the given file."""
         return file_path.suffix.lower() in self.extensions
-    
+
     def analyze_directory(self, dir_path: Path) -> AnalysisResult:
         """Analyze all relevant files in a directory."""
         result = AnalysisResult(
             repo_path=str(dir_path),
             repo_name=dir_path.name,
         )
-        
+
         for file_path in dir_path.rglob("*"):
             if not file_path.is_file():
                 continue
             if not self.can_handle(file_path):
                 continue
-            
+
             try:
                 content = file_path.read_text(encoding="utf-8", errors="ignore")
                 file_result = self.analyze_file(file_path, content)
                 result.merge(file_result)
             except Exception as e:
                 result.errors.append(f"{file_path}: {e}")
-        
+
         return result

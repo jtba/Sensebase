@@ -40,7 +40,9 @@ class OutputGenerator:
         self._write_json(json_dir / "apis.json", self.kb.get_all_apis())
         self._write_json(json_dir / "dependencies.json", self.kb.get_all_dependencies())
         self._write_json(json_dir / "services.json", self.kb.get_all_services())
-        
+        self._write_json(json_dir / "link_types.json", self.kb.get_all_link_types())
+        self._write_json(json_dir / "interfaces.json", self.kb.get_all_interfaces())
+
         console.print(f"[green]✓[/green] Generated JSON output in {json_dir}")
     
     def _write_json(self, path: Path, data: Any) -> None:
@@ -66,7 +68,13 @@ class OutputGenerator:
         
         # Generate dependency documentation
         self._generate_dependency_docs(md_dir / "dependencies")
-        
+
+        # Generate link type documentation
+        self._generate_link_type_docs(md_dir / "link_types")
+
+        # Generate interface documentation
+        self._generate_interface_docs(md_dir / "interfaces")
+
         console.print(f"[green]✓[/green] Generated Markdown output in {md_dir}")
     
     def _generate_index(self, md_dir: Path) -> None:
@@ -86,6 +94,10 @@ Generated: {summary['generated_at']}
 | API Endpoints | {summary['total_apis']} |
 | Services | {summary['total_services']} |
 | Dependencies | {summary['total_dependencies']} ({summary['unique_dependencies']} unique) |
+| Link Types | {summary.get('total_link_types', 0)} |
+| Interfaces | {summary.get('total_interfaces', 0)} |
+| Graph Nodes | {summary.get('graph_nodes', 0)} |
+| Graph Edges | {summary.get('graph_edges', 0)} |
 
 ## Navigation
 
@@ -319,7 +331,63 @@ Generated: {summary['generated_at']}
                     index_content += "\n"
             index_content += "\n"
         (dep_dir / "index.md").write_text(index_content)
-    
+
+    def _generate_link_type_docs(self, link_dir: Path) -> None:
+        """Generate link type documentation."""
+        link_dir.mkdir(exist_ok=True)
+
+        link_types = self.kb.get_all_link_types()
+        if not link_types:
+            (link_dir / "index.md").write_text("# Link Types\n\nNo link types found.\n")
+            return
+
+        index_content = "# Link Types\n\n"
+        index_content += "| Link | Source | Target | Cardinality |\n"
+        index_content += "|------|--------|--------|-------------|\n"
+        for lt in link_types:
+            name = lt.get("name", "unknown")
+            src = lt.get("source_type", "?")
+            tgt = lt.get("target_type", "?")
+            card = lt.get("cardinality", "?")
+            status = lt.get("status", "active")
+            badge = " (deprecated)" if status == "deprecated" else ""
+            index_content += f"| {name}{badge} | {src} | {tgt} | {card} |\n"
+        (link_dir / "index.md").write_text(index_content)
+
+    def _generate_interface_docs(self, iface_dir: Path) -> None:
+        """Generate interface documentation."""
+        iface_dir.mkdir(exist_ok=True)
+
+        interfaces = self.kb.get_all_interfaces()
+        if not interfaces:
+            (iface_dir / "index.md").write_text("# Interfaces\n\nNo interfaces found.\n")
+            return
+
+        index_content = "# Interfaces\n\n"
+        for iface in interfaces:
+            name = iface.get("name", "unknown")
+            desc = iface.get("description", "")
+            inferred = " (inferred)" if iface.get("inferred") else ""
+            status = iface.get("status", "active")
+            badge = f" [{status}]" if status != "active" else ""
+            index_content += f"## {name}{inferred}{badge}\n\n"
+            if desc:
+                index_content += f"{desc}\n\n"
+            props = iface.get("properties", [])
+            if props:
+                index_content += "**Required properties:**\n\n"
+                index_content += "| Name | Type |\n|------|------|\n"
+                for p in props:
+                    index_content += f"| {p.get('name', '?')} | {p.get('type', '?')} |\n"
+                index_content += "\n"
+            impls = iface.get("implemented_by", [])
+            if impls:
+                index_content += f"**Implemented by:** {', '.join(impls)}\n\n"
+            extends = iface.get("extends", [])
+            if extends:
+                index_content += f"**Extends:** {', '.join(extends)}\n\n"
+        (iface_dir / "index.md").write_text(index_content)
+
     def generate_contexts(self) -> None:
         """Generate context.md files per repo and relationships.json."""
         contexts = self.kb.get_all_contexts()
@@ -442,6 +510,46 @@ Generated: {summary['generated_at']}
                     "repo": repo_name,
                     "text": text,
                 })
+
+        # Chunk link types
+        for lt in self.kb.get_all_link_types():
+            name = lt.get("name", "unknown")
+            text = f"Link Type: {name}\n"
+            text += f"Source: {lt.get('source_type', '?')} -> Target: {lt.get('target_type', '?')}\n"
+            text += f"Cardinality: {lt.get('cardinality', '?')}\n"
+            if lt.get("description"):
+                text += f"Description: {lt['description']}\n"
+            if lt.get("properties"):
+                text += "Link properties:\n"
+                for p in lt["properties"]:
+                    text += f"  - {p.get('name', '?')}: {p.get('type', '?')}\n"
+            chunks.append({
+                "id": f"link_type:{name}:{lt.get('source_file', '')}",
+                "type": "link_type",
+                "name": name,
+                "repo": lt.get("repo", ""),
+                "text": text,
+            })
+
+        # Chunk interfaces
+        for iface in self.kb.get_all_interfaces():
+            name = iface.get("name", "unknown")
+            text = f"Interface: {name}\n"
+            if iface.get("description"):
+                text += f"Description: {iface['description']}\n"
+            if iface.get("properties"):
+                text += "Required properties:\n"
+                for p in iface["properties"]:
+                    text += f"  - {p.get('name', '?')}: {p.get('type', '?')}\n"
+            if iface.get("implemented_by"):
+                text += f"Implemented by: {', '.join(iface['implemented_by'])}\n"
+            chunks.append({
+                "id": f"interface:{name}",
+                "type": "interface",
+                "name": name,
+                "repo": iface.get("repo", ""),
+                "text": text,
+            })
 
         # Save chunks
         (vector_dir / "chunks.json").write_text(

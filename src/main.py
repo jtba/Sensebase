@@ -102,10 +102,9 @@ def _apply_semantic_enrichment(repo_result, semantic_data: dict) -> None:
             schema.description = entity_descs[schema.name]
 
         if schema.name in field_descs:
-            for field_dict in schema.fields:
-                fname = field_dict.get("name", "")
-                if fname in field_descs[schema.name]:
-                    field_dict["description"] = field_descs[schema.name][fname]
+            for field_obj in schema.fields:
+                if field_obj.name in field_descs[schema.name]:
+                    field_obj.description = field_descs[schema.name][field_obj.name]
 
     for api_info in repo_result.apis:
         key = f"{api_info.method} {api_info.path}"

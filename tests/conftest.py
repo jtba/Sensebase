@@ -11,6 +11,18 @@ from src.analyzers.base import (
     BusinessLogicInfo,
     DependencyInfo,
 )
+from src.analyzers.ontology import (
+    SchemaType,
+    BusinessLogicType,
+    DependencyType,
+    Ecosystem,
+    HTTPMethod,
+    RelationshipType,
+    FieldInfo,
+    RelationshipRef,
+    MethodInfo,
+    ParamInfo,
+)
 
 
 @pytest.fixture
@@ -18,15 +30,15 @@ def sample_schema():
     """A minimal SchemaInfo for testing."""
     return SchemaInfo(
         name="User",
-        type="model",
+        type=SchemaType.MODEL,
         source_file="models/user.py",
         fields=[
-            {"name": "id", "type": "int", "constraints": ["primary_key"]},
-            {"name": "email", "type": "str", "constraints": ["unique"]},
-            {"name": "name", "type": "str", "constraints": []},
+            FieldInfo(name="id", type="int", constraints=["primary_key"]),
+            FieldInfo(name="email", type="str", constraints=["unique"]),
+            FieldInfo(name="name", type="str", constraints=[]),
         ],
         relationships=[
-            {"type": "has_many", "target": "Order", "field": "orders"},
+            RelationshipRef(type=RelationshipType.HAS_MANY, target="Order", field="orders"),
         ],
     )
 
@@ -36,10 +48,10 @@ def sample_api():
     """A minimal APIInfo for testing."""
     return APIInfo(
         path="/api/users",
-        method="GET",
+        method=HTTPMethod.GET,
         source_file="routes/users.py",
         handler="list_users",
-        params=[{"name": "limit", "type": "int"}],
+        params=[ParamInfo(name="limit", type="int")],
         request_body=None,
         response={"type": "list", "items": "User"},
         description="List all users",
@@ -51,11 +63,15 @@ def sample_service():
     """A minimal BusinessLogicInfo for testing."""
     return BusinessLogicInfo(
         name="UserService",
-        type="service",
+        type=BusinessLogicType.SERVICE,
         source_file="services/user_service.py",
         description="Handles user operations",
         methods=[
-            {"name": "create_user", "params": ["email", "name"], "returns": "User"},
+            MethodInfo(
+                name="create_user",
+                params=[ParamInfo(name="email"), ParamInfo(name="name")],
+                returns="User",
+            ),
         ],
         dependencies=["EmailService"],
         data_accessed=["User"],
@@ -68,9 +84,9 @@ def sample_dependency():
     return DependencyInfo(
         name="fastapi",
         version="0.109.0",
-        type="runtime",
+        type=DependencyType.RUNTIME,
         source_file="pyproject.toml",
-        ecosystem="pip",
+        ecosystem=Ecosystem.PIP,
     )
 
 
