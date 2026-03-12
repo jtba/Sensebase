@@ -678,6 +678,7 @@
     <nav>
         <div class="logo">SenseBase</div>
         <ul class="nav-links">
+            <li><a href="#whats-new">What's New</a></li>
             <li><a href="#how-it-works">How It Works</a></li>
             <li><a href="#dashboard">Dashboard</a></li>
             <li><a href="#features">Features</a></li>
@@ -691,7 +692,7 @@
         <section class="hero">
             <div class="hero-badge">
                 <span class="dot"></span>
-                AI-Powered Code Understanding
+                v0.2.0 &mdash; Ontology Graph Store &amp; Link Types
             </div>
             <h1>
                 Turn Your Codebase Into<br>
@@ -703,11 +704,11 @@
                 that AI agents and humans can search, explore, and query.
             </p>
             <div class="hero-buttons">
-                <a href="#how-it-works" class="btn btn-primary">
-                    See How It Works
+                <a href="#whats-new" class="btn btn-primary">
+                    What's New in v0.2.0
                 </a>
-                <a href="#dashboard" class="btn btn-secondary">
-                    Explore the Dashboard
+                <a href="#how-it-works" class="btn btn-secondary">
+                    See How It Works
                 </a>
             </div>
 
@@ -721,6 +722,51 @@
                     <div class="card-icon">✨</div>
                     <h3>The Solution</h3>
                     <p>SenseBase extracts structural metadata and enriches it with business semantics — a glossary, entity descriptions, field-level documentation, and query recipes that AI agents can use to autonomously answer questions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What's New in v0.2.0 -->
+        <section id="whats-new">
+            <div class="section-header fade-in">
+                <span class="section-tag">What's New in v0.2.0</span>
+                <h2>Ontology-Grade Knowledge Store</h2>
+                <p>Four major upgrades inspired by Palantir Ontology best practices</p>
+            </div>
+
+            <div class="features-grid fade-in">
+                <div class="feature">
+                    <div class="feature-icon">🕸️</div>
+                    <h3>Graph-Queryable Store</h3>
+                    <p>The knowledge base is now backed by a full graph with bidirectional adjacency lists, BFS traversal, path finding, and type/name/repo indexes &mdash; replacing flat dict-of-lists.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>First-Class Link Types</h3>
+                    <p>Relationships are promoted to first-class entities with cardinality (one-to-one, one-to-many, many-to-many), properties, descriptions, and automatic bidirectional inverse navigation.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🧬</div>
+                    <h3>Interface Polymorphism</h3>
+                    <p>Schemas sharing common field signatures across repositories are automatically grouped under inferred interfaces (Auditable, Timestamped, SoftDeletable, etc.) for cross-repo type polymorphism.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Entity Lifecycle Status</h3>
+                    <p>Every schema, API, service, and dependency carries a lifecycle status &mdash; active, deprecated, experimental, or draft &mdash; so consumers know what's safe to depend on.</p>
+                </div>
+            </div>
+
+            <div class="steps fade-in" style="margin-top: 3rem;">
+                <div class="step">
+                    <div class="step-number">+</div>
+                    <h3>Impact Analysis</h3>
+                    <p>Ask "what breaks if I change User?" and get a transitive dependency graph: downstream schemas, services, APIs, and data flows &mdash; all via BFS traversal of the ontology graph.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">+</div>
+                    <h3>Backward Compatible</h3>
+                    <p>v0.2.0 reads existing v1 knowledge base files and rebuilds the graph automatically. No migration needed &mdash; just upgrade and re-analyze.</p>
                 </div>
             </div>
         </section>
@@ -772,6 +818,14 @@
                         <div class="diagram-node-icon">💡</div>
                         <div class="diagram-node-label">Semantic Layer</div>
                         <div class="diagram-node-sub">Business Context</div>
+                    </div>
+
+                    <div class="diagram-arrow">&rarr;</div>
+
+                    <div class="diagram-node highlight">
+                        <div class="diagram-node-icon">🕸️</div>
+                        <div class="diagram-node-label">Graph Store</div>
+                        <div class="diagram-node-sub">Links, Interfaces, Traversal</div>
                     </div>
 
                     <div class="diagram-arrow">&rarr;</div>
@@ -873,8 +927,18 @@
                 </div>
                 <div class="dashboard-card">
                     <div class="dashboard-card-icon">🔗</div>
-                    <h4>Relationships</h4>
-                    <p>Cross-repository service dependencies and data ownership chains</p>
+                    <h4>Link Types</h4>
+                    <p>First-class bidirectional relationships with cardinality, properties, and inverse navigation</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">🧬</div>
+                    <h4>Interfaces</h4>
+                    <p>Cross-repo type polymorphism: schemas sharing field signatures grouped under inferred interfaces</p>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon">💥</div>
+                    <h4>Impact Analysis</h4>
+                    <p>Transitive dependency queries: see what breaks downstream when you change any entity</p>
                 </div>
                 <div class="dashboard-card">
                     <div class="dashboard-card-icon">🚀</div>
@@ -944,6 +1008,16 @@
                     <p>LLM results cached by content hash. Changed files get re-analyzed; unchanged files are instant. Semantic enrichment cached per repo.</p>
                 </div>
                 <div class="feature">
+                    <div class="feature-icon">🕸️</div>
+                    <h3>Graph Traversal</h3>
+                    <p>BFS-powered queries across the ontology graph: find paths between entities, traverse by edge type and depth, and run impact analysis on any node.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🏷️</div>
+                    <h3>Entity Lifecycle</h3>
+                    <p>Every entity carries a status &mdash; active, deprecated, experimental, or draft &mdash; so AI agents and developers know what's production-ready and what to avoid.</p>
+                </div>
+                <div class="feature">
                     <div class="feature-icon">🔒</div>
                     <h3>Private & Secure</h3>
                     <p>Runs on your infrastructure. Your code never leaves your network except for optional LLM calls to your chosen provider (Anthropic, OpenAI, or AWS Bedrock).</p>
@@ -962,7 +1036,11 @@
                 <span class="comment"># Semantic search with natural language</span><br>
                 <span class="command">curl</span> "http://localhost:8000/semantic/search?q=payment+processing"<br><br>
                 <span class="comment"># Schema detail with business context</span><br>
-                <span class="command">curl</span> "http://localhost:8000/schemas/Booking"
+                <span class="command">curl</span> "http://localhost:8000/schemas/Booking"<br><br>
+                <span class="comment"># Impact analysis: what depends on User?</span><br>
+                <span class="command">curl</span> "http://localhost:8000/graph/impact?entity=User&amp;depth=3"<br><br>
+                <span class="comment"># Browse link types and interfaces</span><br>
+                <span class="command">curl</span> "http://localhost:8000/link-types"
             </div>
         </section>
 
@@ -1086,7 +1164,7 @@
     </main>
 
     <footer>
-        <p>SenseBase &mdash; Your codebase, understood. Built for modern engineering teams.</p>
+        <p>SenseBase v0.2.0 &mdash; Your codebase, understood. Built for modern engineering teams.</p>
     </footer>
 
     <script>
